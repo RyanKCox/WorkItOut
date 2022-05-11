@@ -1,4 +1,4 @@
-package com.revature.workitout.model.retrofit.allexcercises
+package com.revature.workitout.model.retrofit.responses
 
 import com.google.gson.annotations.SerializedName
 
