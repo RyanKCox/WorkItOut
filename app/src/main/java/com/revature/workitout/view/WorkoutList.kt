@@ -1,6 +1,6 @@
 package com.revature.workitout.view
 
-import androidx.compose.foundation.Image
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.decode.GifDecoder
 import com.revature.workitout.model.retrofit.responses.Exercise
 import com.revature.workitout.viewmodel.WorkoutListVM
 import androidx.compose.foundation.layout.*
@@ -21,11 +20,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
-import coil.compose.rememberImagePainter
-import com.revature.workitout.R
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +28,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.ViewModelProvider
 import com.revature.workitout.MainActivity
+import com.revature.workitout.view.nav.NavScreen
+import com.revature.workitout.viewmodel.SingleExerciseVM
 
 @Composable
 fun WorkoutList(navController: NavController){
@@ -62,31 +59,14 @@ fun WorkoutList(navController: NavController){
             if(viewModel.bLoading.value){
 
                 item {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-
-//                        Text("Loading")
-                        CircularProgressIndicator()
-
-                    }
+                    onLoading()
                 }
 
-            }else if(viewModel.bLoadingFailed.value){
+            }
+            else if(viewModel.bLoadingFailed.value){
 
                 item{
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text("Something went wrong!")
-
-                    }
+                    onLoadingFail()
                 }
 
             }
@@ -98,7 +78,7 @@ fun WorkoutList(navController: NavController){
 
                 items(exercises.value) { exercise ->
 
-                    ExerciseCard(exercise,navController)
+                    ExerciseCard(exercise,navController,context)
 
                 }
             }
@@ -133,8 +113,7 @@ fun BodypartDropDown(viewModel:WorkoutListVM){
             trailingIcon = {
                 Icon(
                     icon,
-                    "BodypartDrowdown",
-//                    Modifier.clickable { bOpen = !bOpen }
+                    "BodypartDrowdown"
                 )
             },
             enabled = false
@@ -172,41 +151,54 @@ fun BodypartDropDown(viewModel:WorkoutListVM){
 }
 
 @Composable
-fun ExerciseCard(exercise:Exercise,navController: NavController){
+fun ExerciseCard(
+    exercise:Exercise,
+    navController: NavController,
+    context: Context
+){
+
 
 
     Card(
         shape =  RoundedCornerShape(10.dp),
         elevation = 10.dp,
-        modifier = Modifier.padding(10.dp)
+        modifier = Modifier
+            .padding(10.dp)
+            .clickable {
+                val singleVM =
+                    ViewModelProvider(context as MainActivity)
+                        .get(SingleExerciseVM::class.java)
+                singleVM.loadExercise(exercise.id)
+                navController.navigate(NavScreen.SingleExerciseScreen.route)
+
+            }
     ) {
         Row {
-            Image(
-                painter = rememberImagePainter(
-                    data = exercise.gifUrl,
-                    builder = {
-                        decoder(GifDecoder())
-                        placeholder(R.drawable.workitout_logo)
-                        crossfade(true)
-                    }
-                ),
-                contentDescription = "exerciseGif",
-                modifier = Modifier.size(150.dp)
-            )
+
+            gifLoader(exercise,Modifier.size(150.dp))
+
             Column {
 
                 Text(
                     text = exercise.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.subtitle1,
                     modifier = Modifier
                         .padding(3.dp)
                         .fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
-                Text( "Body Part: ${exercise.bodyPart}")
-                Text( "Target: ${exercise.target}")
-                Text( "Equipment: ${exercise.equipment}")
+                Text(
+                    "Body Part: ${exercise.bodyPart}",
+                    style = MaterialTheme.typography.body1
+                )
+                Text(
+                    "Target: ${exercise.target}",
+                    style = MaterialTheme.typography.body1
+                )
+                Text(
+                    "Equipment: ${exercise.equipment}",
+                    style = MaterialTheme.typography.body1
+                )
 
 
             }

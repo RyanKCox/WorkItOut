@@ -7,13 +7,13 @@ data class Exercise(
     @SerializedName("id")
     val id:String,
     @SerializedName("name")
-    val name:String,
+    var name:String,
     @SerializedName("target")
-    val target:String,
+    var target:String,
     @SerializedName("bodyPart")
-    val bodyPart:String,
+    var bodyPart:String,
     @SerializedName("equipment")
-    val equipment:String,
+    var equipment:String,
     @SerializedName("gifUrl")
     var gifUrl:String
 
