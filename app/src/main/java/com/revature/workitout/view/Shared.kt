@@ -21,7 +21,7 @@ import com.revature.workitout.R
 import com.revature.workitout.model.retrofit.responses.Exercise
 
 @Composable
-fun gifLoader(exercise:Exercise,modifier:Modifier = Modifier){
+fun GifLoader(exercise:Exercise,modifier:Modifier = Modifier){
     Image(
         painter = rememberImagePainter(
             data = exercise.gifUrl,
@@ -36,7 +36,7 @@ fun gifLoader(exercise:Exercise,modifier:Modifier = Modifier){
     )
 }
 @Composable
-fun onLoadingFail(){
+fun OnLoadingFail(){
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -47,7 +47,7 @@ fun onLoadingFail(){
     }
 }
 @Composable
-fun onLoading(){
+fun OnLoading(){
     Column(
         modifier = Modifier
             .fillMaxSize(),

@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
@@ -61,7 +60,7 @@ fun SingleExercise(navController: NavController){
                         else
                                 context.resources.displayMetrics.heightPixels/context.resources.displayMetrics.density
 
-                        gifLoader(
+                        GifLoader(
                             exercise = exercise.value!!,
                             modifier = Modifier
                                 .size(display.dp)
@@ -84,11 +83,11 @@ fun SingleExercise(navController: NavController){
                         }
                     }
                     else if(viewModel.bLoading.value){
-                        onLoading()
+                        OnLoading()
 
                     }
                     else{
-                        onLoadingFail()
+                        OnLoadingFail()
                     }
 
                 }
@@ -166,7 +165,7 @@ fun DisplayInfo(exercise: Exercise){
 }
 @Preview
 @Composable
-fun previewDisplayInfo(){
+fun PreviewDisplayInfo(){
     DisplayInfo(
         Exercise(
             id = "0001",

@@ -59,14 +59,14 @@ fun WorkoutList(navController: NavController){
             if(viewModel.bLoading.value){
 
                 item {
-                    onLoading()
+                    OnLoading()
                 }
 
             }
             else if(viewModel.bLoadingFailed.value){
 
                 item{
-                    onLoadingFail()
+                    OnLoadingFail()
                 }
 
             }
@@ -175,7 +175,7 @@ fun ExerciseCard(
     ) {
         Row {
 
-            gifLoader(exercise,Modifier.size(150.dp))
+            GifLoader(exercise,Modifier.size(150.dp))
 
             Column {
 

@@ -1,26 +1,19 @@
 package com.revature.workitout.view
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.*
-import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.revature.workitout.MainActivity
+import com.revature.workitout.view.nav.NavScreen
 import com.revature.workitout.viewmodel.SingleExerciseVM
 
 @Composable
@@ -61,7 +54,7 @@ fun AddToRoutine(navController: NavController) {
                         else
                             context.resources.displayMetrics.heightPixels/context.resources.displayMetrics.density
 
-                    gifLoader(
+                    GifLoader(
                         exercise = exercise.value!!,
                         modifier = Modifier
                             .size(display.dp)
@@ -110,6 +103,14 @@ fun AddToRoutine(navController: NavController) {
                             }
                         }
 
+                    }
+
+                    Button(
+                        onClick = {
+                            navController.navigate(NavScreen.MainMenuScreen.route)
+                        }
+                    ) {
+                        Text("Add")
                     }
                 }
             }
