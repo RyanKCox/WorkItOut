@@ -58,7 +58,12 @@ fun onLoading(){
     }
 }
 @Composable
-fun DropDown(label:String,list:List<String>,subString:String,onValueChange:(String)->Unit){
+fun DropDown(
+    label:String,
+    list:List<String>,
+    modifier: Modifier = Modifier,
+    subString:String = "",
+    onValueChange:(String)->Unit){
 
     var bOpen by rememberSaveable{ mutableStateOf(false) }
     val icon = if(bOpen)
@@ -67,7 +72,7 @@ fun DropDown(label:String,list:List<String>,subString:String,onValueChange:(Stri
         Icons.Filled.KeyboardArrowDown
     var sSelected by rememberSaveable{ mutableStateOf(list.first())}
 
-    Column(Modifier.padding(10.dp)) {
+    Column(modifier.padding(10.dp)) {
         OutlinedTextField(
             value = "$sSelected$subString",
             onValueChange ={sSelected = it},
@@ -77,7 +82,7 @@ fun DropDown(label:String,list:List<String>,subString:String,onValueChange:(Stri
                 Icon(icon,"TimerIcon")
             },
             modifier = Modifier
-                .fillMaxWidth(.5f)
+//                .fillMaxWidth(.5f)
                 .clickable {
                     bOpen = !bOpen
                 }
@@ -85,7 +90,6 @@ fun DropDown(label:String,list:List<String>,subString:String,onValueChange:(Stri
         DropdownMenu(
             expanded =bOpen,
             onDismissRequest = { bOpen = false },
-            modifier = Modifier.fillMaxWidth(.5f)
         ) {
             list.forEach { time->
                 DropdownMenuItem(

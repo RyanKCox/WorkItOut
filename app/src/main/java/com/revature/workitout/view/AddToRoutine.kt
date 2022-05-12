@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.revature.workitout.MainActivity
@@ -71,7 +72,7 @@ fun AddToRoutine(navController: NavController) {
                         //Time for Cardio
                         DropDown(
                             label = "Time",
-                            list = listOf("5", "10", "15", "20", "25", "30"),
+                            list = viewModel.setList /*listOf("5", "10", "15", "20", "25", "30")*/,
                             subString = " min."
                         ){
                             viewModel.sSet.value = it
@@ -81,6 +82,33 @@ fun AddToRoutine(navController: NavController) {
                     }
                     else{
                         // rep/set count for other
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            DropDown(
+                                label = "Sets",
+                                list = viewModel.setList,
+                                subString = " sets",
+                                modifier = Modifier.weight(1f)
+                            ){
+                                viewModel.sSet.value = it
+                            }
+
+                            Text(
+                                text = " of "
+                            )
+
+                            DropDown(
+                                label = "Reps",
+                                list = viewModel.repList,
+                                subString = " reps",
+                                modifier = Modifier.weight(1f)
+                            ){
+                                viewModel.sRep.value = it
+                            }
+                        }
 
                     }
                 }

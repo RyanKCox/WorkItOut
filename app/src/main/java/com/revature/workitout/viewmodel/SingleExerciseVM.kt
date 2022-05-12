@@ -1,6 +1,7 @@
 package com.revature.workitout.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.capitalize
 import androidx.lifecycle.MutableLiveData
@@ -27,6 +28,8 @@ class SingleExerciseVM: ViewModel() {
     //AddRoutineScreen
     var sSet = mutableStateOf("5")
     var sRep = mutableStateOf("5")
+    val setList = mutableStateListOf("5", "10", "15", "20", "25", "30")
+    val repList:List<String> = mutableStateListOf("1","2","3","4","5","6","7","8","9","10")
 
     fun loadExercise(id:String){
         if(id != "") {
