@@ -18,13 +18,13 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import coil.decode.GifDecoder
 import com.revature.workitout.R
-import com.revature.workitout.model.retrofit.responses.Exercise
+import com.revature.workitout.model.room.entity.ExerciseEntity
 
 @Composable
-fun GifLoader(exercise:Exercise,modifier:Modifier = Modifier){
+fun GifLoader(exercise:ExerciseEntity,modifier:Modifier = Modifier){
     Image(
         painter = rememberImagePainter(
-            data = exercise.gifUrl,
+            data = exercise.sGifUrl,
             builder = {
                 decoder(GifDecoder())
                 placeholder(R.drawable.workitout_logo)

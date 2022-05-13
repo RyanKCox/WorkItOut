@@ -1,4 +1,4 @@
-package com.revature.workitout.model.room
+package com.revature.workitout.model.room.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
@@ -12,17 +12,17 @@ interface RoutineDAO {
     fun fetchALlRoutines():LiveData<List<Routine>>
 
     @Query("SELECT * FROM Components WHERE RoutineID = :id")
-    suspend fun fetchRoutine(id:Int):LiveData<List<RoutineComponent>>
+    fun fetchRoutine(id:Int):LiveData<List<RoutineComponent>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRoutine(routine:Routine):Long
+    fun insertRoutine(routine:Routine):Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertComponent(component:RoutineComponent):Long
+    fun insertComponent(component:RoutineComponent):Long
 
     @Delete
-    suspend fun deleteRoutine(routine:Routine)
+    fun deleteRoutine(routine:Routine)
 
     @Delete
-    suspend fun deleteComponent(component:RoutineComponent)
+    fun deleteComponent(component:RoutineComponent)
 }

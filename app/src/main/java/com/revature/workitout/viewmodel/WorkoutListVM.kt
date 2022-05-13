@@ -1,28 +1,24 @@
 package com.revature.workitout.viewmodel
 
+import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.revature.workitout.model.retrofit.BodypartRepo
 import com.revature.workitout.model.retrofit.RetrofitHelper
 import com.revature.workitout.model.retrofit.repos.AllExercisesRepo
-import com.revature.workitout.model.retrofit.responses.Exercise
+import com.revature.workitout.model.room.entity.ExerciseEntity
+import com.revature.workitout.model.room.repo.ExerciseRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class WorkoutListVM:ViewModel() {
 
-    //Retrofit Variables
-    private val exerciseService = RetrofitHelper.getWorkoutService()
-    private var exerciseRepo: AllExercisesRepo = AllExercisesRepo(exerciseService)
-    private var bodypartRepo:BodypartRepo = BodypartRepo(exerciseService)
-
-
     //Exercise List
-    val exerciseList = MutableLiveData<List<Exercise>>(listOf())
+    var exerciseList = MutableLiveData<List<ExerciseEntity>>(listOf())
     private val bodypartList = MutableLiveData<List<String>>(listOf())
     fun getBodyparts():LiveData<List<String>>{
         return bodypartList
@@ -32,49 +28,48 @@ class WorkoutListVM:ViewModel() {
     var bLoading = mutableStateOf(true)
     var bLoadingFailed = mutableStateOf(false)
 
-    init {
+    private fun loadBodyparts(exerciseRoomRepo: ExerciseRepo){
 
-        loadExercises()
-        loadBodyparts()
+        viewModelScope.launch(Dispatchers.IO) {
+            bodypartList.postValue(exerciseRoomRepo.getAllBodyParts())
+        }
     }
-    private fun loadBodyparts(){
+
+    fun loadExerciseByBodypart(sBodypart:String,context: Context){
+
+        viewModelScope.launch(Dispatchers.IO) {
+        val exerciseRoomRepo = ExerciseRepo(context.applicationContext as Application)
+
+            exerciseList.postValue(exerciseRoomRepo.getExercisesByBodypart(sBodypart))
+        }
+    }
+
+    fun loadExercises(context: Context){
+
         viewModelScope.launch(Dispatchers.IO) {
 
-            when(val response = bodypartRepo.fetchAllBodyparts()){
-                is BodypartRepo.Result.Success ->{
-                    var list = mutableListOf<String>()
-                    list.add("All")
-                    list.addAll(response.bodypartList)
-                    bodypartList.postValue(list)
-                }
-                is BodypartRepo.Result.Failure->{
-                    Log.d("WorkoutVM","Loading Bodyparts failed")
-                }
-                is BodypartRepo.Result.Loading->{
+            val exerciseRoomRepo = ExerciseRepo(context.applicationContext as Application)
 
-                }
+            val list = exerciseRoomRepo.getAllExercises
+
+            if(list.isNotEmpty()) {
+                Log.d("WorkoutlistVM", "Exercise Room Not Empty")
+                exerciseList.postValue(exerciseRoomRepo.getAllExercises)
+                bLoading.value = false
+            } else{
+                Log.d("WorkoutlistVM", "Exercise Room Empty")
+                loadExercisesByAPI(exerciseRoomRepo)
             }
+
+            loadBodyparts(exerciseRoomRepo)
         }
     }
 
-    fun LoadBodyPartbyPart(part:String){
-        viewModelScope.launch(Dispatchers.IO){
-            when(val response = exerciseRepo.fetchByBodypart(part)) {
-                is AllExercisesRepo.Result.Success->{
-                    response.exerciseList.forEach { exercise ->
-                        val temp = exercise.gifUrl.replace("http", "https")
-                        exercise.gifUrl = temp
-                    }
-                    exerciseList.postValue(response.exerciseList)
-                }
-                is AllExercisesRepo.Result.Failure->{
-                    Log.d("WorkoutVM", "Loading Exercises Failed")
-                }
-                is AllExercisesRepo.Result.Loading->{}
-            }
-        }
-    }
-    fun loadExercises() {
+    private fun loadExercisesByAPI(exerciseRoomRepo:ExerciseRepo) {
+
+        val exerciseService = RetrofitHelper.getWorkoutService()
+        val exerciseRepo = AllExercisesRepo(exerciseService)
+
         viewModelScope.launch(Dispatchers.IO) {
 
             bLoading.value = when (val response = exerciseRepo.fetchAllExercises()) {
@@ -84,7 +79,20 @@ class WorkoutListVM:ViewModel() {
                         val temp = exercise.gifUrl.replace("http", "https")
                         exercise.gifUrl = temp
                     }
-                    exerciseList.postValue(response.exerciseList)
+                    val list = mutableListOf<ExerciseEntity>()
+                    response.exerciseList.forEach {
+                        val exe = ExerciseEntity(
+                            id = it.id.toInt(),
+                            sName = it.name,
+                            sTarget = it.target,
+                            sBodypart = it.bodyPart,
+                            sEquipment = it.equipment,
+                            sGifUrl = it.gifUrl
+                        )
+                        exerciseRoomRepo.insertExercise(exe)
+                        list.add(exe)
+                    }
+                    exerciseList.postValue(list)
                     false
                 }
                 is AllExercisesRepo.Result.Failure -> {
@@ -96,9 +104,6 @@ class WorkoutListVM:ViewModel() {
                     true
                 }
             }
-
         }
     }
-
-
 }

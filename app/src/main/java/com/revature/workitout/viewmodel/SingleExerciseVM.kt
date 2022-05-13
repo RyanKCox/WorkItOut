@@ -1,61 +1,49 @@
 package com.revature.workitout.viewmodel
 
-import android.util.Log
+import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.text.capitalize
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.revature.workitout.model.retrofit.RetrofitHelper
-import com.revature.workitout.model.retrofit.repos.ExerciseRepo
-import com.revature.workitout.model.retrofit.responses.Exercise
+import com.revature.workitout.model.constants.RoutineBuilder
+import com.revature.workitout.model.room.entity.ExerciseEntity
+import com.revature.workitout.model.room.repo.ExerciseRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SingleExerciseVM: ViewModel() {
 
-    //Retrofit Variables
-    private val exerciseService = RetrofitHelper.getWorkoutService()
-    private val singleExerciseRepo = ExerciseRepo(exerciseService)
-
     //Display Screen
-    var exerciseId = ""
-    val exercise = MutableLiveData<Exercise>()
+    val exercise = MutableLiveData<ExerciseEntity>()
     val bLoading = mutableStateOf(true)
     val bLoadingFailed = mutableStateOf(false)
 
     //AddRoutineScreen
     var sSet = mutableStateOf("5")
     var sRep = mutableStateOf("5")
-    val setList = mutableStateListOf("5", "10", "15", "20", "25", "30")
-    val repList:List<String> = mutableStateListOf("1","2","3","4","5","6","7","8","9","10")
+    var setList = RoutineBuilder.EXERCISE_SET_LIST
+    var repList = RoutineBuilder.EXERCISE_REP_LIST
 
-    fun loadExercise(id:String){
-        if(id != "") {
-            exerciseId=id
-            viewModelScope.launch(Dispatchers.IO) {
-                bLoading.value = when (val result = singleExerciseRepo.fetchExerciseById(exerciseId)){
-                    is ExerciseRepo.Result.Success->{
-                        result.exercise.gifUrl = result.exercise.gifUrl.replace("http","https")
+    fun loadExercise(id:Int,context: Context) {
 
-                        result.exercise.name = makeUppercase(result.exercise.name)
 
-                        exercise.postValue(result.exercise)
-                        false
-                    }
-                    is ExerciseRepo.Result.Failure->{
-                        bLoadingFailed.value = true
-                        Log.d("SingleVM","Loading Exercise failed")
-                        false
-                    }
-                    is ExerciseRepo.Result.Loading->{
-                        true
-                    }
-                }
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+        val exerciseRoomRepo =
+           ExerciseRepo(context.applicationContext as Application)
+
+            val exe = exerciseRoomRepo.getExerciseById(id)
+
+            if(exe.sBodypart == RoutineBuilder.EXERCISE_TYPE_CARDIO)
+                setList = RoutineBuilder.CARDIO_SET_LIST
+
+            exercise.postValue(exe)
+            bLoading.value = false
         }
+
     }
+
 
 
 }

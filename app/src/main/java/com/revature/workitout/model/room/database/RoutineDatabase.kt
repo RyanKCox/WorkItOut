@@ -1,9 +1,10 @@
-package com.revature.workitout.model.room
+package com.revature.workitout.model.room.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.revature.workitout.model.room.dao.RoutineDAO
 import com.revature.workitout.model.room.entity.Routine
 import com.revature.workitout.model.room.entity.RoutineComponent
 
@@ -18,7 +19,7 @@ abstract class RoutineDatabase:RoomDatabase() {
     companion object{
         @Volatile
         private var INSTANCE: RoutineDatabase? = null
-        fun getDataBase(context: Context):RoutineDatabase{
+        fun getDataBase(context: Context): RoutineDatabase {
             val instance = INSTANCE
             if(instance != null)
                 return instance

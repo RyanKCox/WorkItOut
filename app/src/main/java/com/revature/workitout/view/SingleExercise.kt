@@ -11,12 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.revature.workitout.MainActivity
-import com.revature.workitout.model.retrofit.responses.Exercise
+import com.revature.workitout.model.room.entity.ExerciseEntity
 import com.revature.workitout.view.nav.NavScreen
 import com.revature.workitout.viewmodel.SingleExerciseVM
 
@@ -35,7 +34,7 @@ fun SingleExercise(navController: NavController){
                 title = {
                     Text(
                             if(exercise.value!=null)
-                                exercise.value!!.name
+                                exercise.value!!.sName
                             else
                                 "Exercise"
                     )
@@ -96,7 +95,7 @@ fun SingleExercise(navController: NavController){
     }
 }
 @Composable
-fun DisplayInfo(exercise: Exercise){
+fun DisplayInfo(exercise: ExerciseEntity){
 
     Column(
         modifier = Modifier
@@ -117,7 +116,7 @@ fun DisplayInfo(exercise: Exercise){
             }
             Column(Modifier.fillMaxWidth()) {
                 Text(
-                    exercise.bodyPart,
+                    exercise.sBodypart,
                     style = MaterialTheme.typography.body1)
 
             }
@@ -136,7 +135,7 @@ fun DisplayInfo(exercise: Exercise){
             }
             Column(Modifier.fillMaxWidth()) {
                 Text(
-                    exercise.target,
+                    exercise.sTarget,
                     style = MaterialTheme.typography.body1)
 
             }
@@ -155,25 +154,11 @@ fun DisplayInfo(exercise: Exercise){
             }
             Column(Modifier.fillMaxWidth()) {
                 Text(
-                    exercise.equipment,
+                    exercise.sEquipment,
                     style = MaterialTheme.typography.body1)
 
             }
 
         }
     }
-}
-@Preview
-@Composable
-fun PreviewDisplayInfo(){
-    DisplayInfo(
-        Exercise(
-            id = "0001",
-            name = "test",
-            target = "Chesttest longtestchest",
-            bodyPart = "Another Long Test",
-            equipment = "Big Equipment",
-            gifUrl = "none"
-        )
-    )
 }

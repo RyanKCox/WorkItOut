@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.revature.workitout.MainActivity
+import com.revature.workitout.model.constants.RoutineBuilder
 import com.revature.workitout.view.nav.NavScreen
 import com.revature.workitout.viewmodel.SingleExerciseVM
 
@@ -31,7 +32,7 @@ fun AddToRoutine(navController: NavController) {
                 title = {
                     Text(
                         if (exercise.value != null)
-                            exercise.value!!.name
+                            exercise.value!!.sName
                         else
                             "Exercise"
                     )
@@ -61,16 +62,16 @@ fun AddToRoutine(navController: NavController) {
                             .padding(40.dp)
                     )
 
-                    if(exercise.value!!.bodyPart == "cardio"){
+                    if(exercise.value!!.sBodypart == RoutineBuilder.EXERCISE_TYPE_CARDIO){
+
                         //Time for Cardio
                         DropDown(
                             label = "Time",
-                            list = viewModel.setList /*listOf("5", "10", "15", "20", "25", "30")*/,
+                            list = viewModel.setList,
                             subString = " min."
                         ){
                             viewModel.sSet.value = it
                         }
-                        Text(viewModel.sSet.value)
 
                     }
                     else{

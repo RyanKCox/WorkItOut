@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.revature.workitout.model.retrofit.responses.Exercise
 import com.revature.workitout.viewmodel.WorkoutListVM
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -28,6 +27,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.ViewModelProvider
 import com.revature.workitout.MainActivity
+import com.revature.workitout.model.room.entity.ExerciseEntity
 import com.revature.workitout.view.nav.NavScreen
 import com.revature.workitout.viewmodel.SingleExerciseVM
 
@@ -36,6 +36,7 @@ fun WorkoutList(navController: NavController){
     val context = LocalContext.current
 
     val viewModel = ViewModelProvider(context as MainActivity).get(WorkoutListVM::class.java)
+    viewModel.loadExercises(context)
 
     val exercises = viewModel.exerciseList.observeAsState(listOf())
 
@@ -87,6 +88,8 @@ fun WorkoutList(navController: NavController){
 }
 @Composable
 fun BodypartDropDown(viewModel:WorkoutListVM){
+
+    val context = LocalContext.current
     var bOpen by rememberSaveable{mutableStateOf(false)}
     val bodyparts = viewModel.getBodyparts().observeAsState()
     var sSelected by rememberSaveable{ mutableStateOf("All")}
@@ -132,9 +135,9 @@ fun BodypartDropDown(viewModel:WorkoutListVM){
                     onClick = {
                         sSelected = part
                         if(sSelected == "All"){
-                            viewModel.loadExercises()
+                            viewModel.loadExercises(context)
                         }else {
-                            viewModel.LoadBodyPartbyPart(sSelected)
+                            viewModel.loadExerciseByBodypart(sSelected,context)
                         }
                         bOpen = false
                     }
@@ -152,7 +155,7 @@ fun BodypartDropDown(viewModel:WorkoutListVM){
 
 @Composable
 fun ExerciseCard(
-    exercise:Exercise,
+    exercise:ExerciseEntity,
     navController: NavController,
     context: Context
 ){
@@ -168,7 +171,7 @@ fun ExerciseCard(
                 val singleVM =
                     ViewModelProvider(context as MainActivity)
                         .get(SingleExerciseVM::class.java)
-                singleVM.loadExercise(exercise.id)
+                singleVM.loadExercise(exercise.id,context)
                 navController.navigate(NavScreen.SingleExerciseScreen.route)
 
             }
@@ -180,7 +183,7 @@ fun ExerciseCard(
             Column {
 
                 Text(
-                    text = exercise.name,
+                    text = exercise.sName,
                     style = MaterialTheme.typography.subtitle1,
                     modifier = Modifier
                         .padding(3.dp)
@@ -188,15 +191,15 @@ fun ExerciseCard(
                     textAlign = TextAlign.Center
                 )
                 Text(
-                    "Body Part: ${exercise.bodyPart}",
+                    "Body Part: ${exercise.sBodypart}",
                     style = MaterialTheme.typography.body1
                 )
                 Text(
-                    "Target: ${exercise.target}",
+                    "Target: ${exercise.sTarget}",
                     style = MaterialTheme.typography.body1
                 )
                 Text(
-                    "Equipment: ${exercise.equipment}",
+                    "Equipment: ${exercise.sEquipment}",
                     style = MaterialTheme.typography.body1
                 )
 

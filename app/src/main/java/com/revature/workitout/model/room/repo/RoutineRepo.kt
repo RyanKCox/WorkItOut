@@ -1,7 +1,9 @@
-package com.revature.workitout.model.room
+package com.revature.workitout.model.room.repo
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import com.revature.workitout.model.room.database.RoutineDatabase
+import com.revature.workitout.model.room.dao.RoutineDAO
 import com.revature.workitout.model.room.entity.Routine
 
 class RoutineRepo(app:Application) {
