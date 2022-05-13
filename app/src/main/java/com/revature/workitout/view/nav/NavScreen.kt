@@ -7,5 +7,6 @@ sealed class NavScreen(
     object WorkoutListScreen:NavScreen("WorkoutList")
     object SingleExerciseScreen:NavScreen("SingleExercise")
     object AddToRoutineScreen:NavScreen("AddToRoutine")
+    object RoutineViewScreen:NavScreen("RoutineView")
 
 }

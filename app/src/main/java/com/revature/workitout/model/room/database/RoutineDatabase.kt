@@ -5,11 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.revature.workitout.model.room.dao.RoutineDAO
-import com.revature.workitout.model.room.entity.Routine
+import com.revature.workitout.model.room.entity.RoutineEntity
 import com.revature.workitout.model.room.entity.RoutineComponent
 
 @Database(
-    entities = [Routine::class,RoutineComponent::class],
+    entities = [RoutineEntity::class,RoutineComponent::class],
     version = 1,
     exportSchema = false
 )

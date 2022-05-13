@@ -9,7 +9,7 @@ data class RoutineComponent(
     @PrimaryKey(autoGenerate = true)
     val id:Int,
     val RoutineID:Int,
-    val ExerciseID:String,
+    val ExerciseID:Int,
     val Set:Int,
     val Rep:Int
 

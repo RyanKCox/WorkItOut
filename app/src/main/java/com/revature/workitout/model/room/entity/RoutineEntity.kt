@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "Routines")
-data class Routine (
+data class RoutineEntity (
 
     @PrimaryKey(autoGenerate = true)
     val id:Int,
