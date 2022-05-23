@@ -14,6 +14,7 @@ import com.revature.workitout.model.room.entity.ExerciseEntity
 import com.revature.workitout.model.room.repo.ExerciseRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.revature.workitout.model.data.Result
 
 class WorkoutListVM:ViewModel() {
 
@@ -74,13 +75,13 @@ class WorkoutListVM:ViewModel() {
 
             bLoading.value = when (val response = exerciseRepo.fetchAllExercises()) {
 
-                is AllExercisesRepo.Result.Success -> {
-                    response.exerciseList.forEach { exercise ->
+                is Result.Success -> {
+                    response.data.forEach { exercise ->
                         val temp = exercise.gifUrl.replace("http", "https")
                         exercise.gifUrl = temp
                     }
                     val list = mutableListOf<ExerciseEntity>()
-                    response.exerciseList.forEach {
+                    response.data.forEach {
                         val exe = ExerciseEntity(
                             id = it.id.toInt(),
                             sName = it.name,
@@ -95,12 +96,12 @@ class WorkoutListVM:ViewModel() {
                     exerciseList.postValue(list)
                     false
                 }
-                is AllExercisesRepo.Result.Failure -> {
-                    Log.d("WorkoutVM", "Loading Exercises Failed")
+                is Result.Error -> {
+                    Log.d("WorkoutVM", "Loading Exercises Failed\nError - ${response.exception}")
                     bLoadingFailed.value = true
                     false
                 }
-                is AllExercisesRepo.Result.Loading -> {
+                is Result.Loading -> {
                     true
                 }
             }

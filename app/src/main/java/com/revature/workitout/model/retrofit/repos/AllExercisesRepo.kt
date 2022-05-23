@@ -4,36 +4,37 @@ import android.util.Log
 import com.revature.workitout.model.retrofit.WorkoutApiService
 import com.revature.workitout.model.retrofit.responses.Exercise
 import java.lang.Exception
+import com.revature.workitout.model.data.Result
 
 class AllExercisesRepo(private val exerciseService: WorkoutApiService) {
 
-    sealed class Result{
-        object Loading: Result()
-        data class Success(val exerciseList: List<Exercise>): Result()
-        data class Failure(val throwable: Throwable): Result()
-    }
+//    sealed class Result{
+//        object Loading: Result()
+//        data class Success(val exerciseList: List<Exercise>): Result()
+//        data class Failure(val throwable: Throwable): Result()
+//    }
 
-    suspend fun fetchAllExercises(): Result {
+    suspend fun fetchAllExercises(): Result<List<Exercise>> {
         return try{
             val result =
                 exerciseService.getAllExercises()
 
-            Result.Success(result)
+            Result.Success<List<Exercise>>(result)
 
         } catch (e:Exception){
             Log.d("AllExerciseRepo", "Failed: ${e.message}")
-            Result.Failure(e)
+            Result.Error(e)
         }
     }
 
-    suspend fun fetchByBodypart(part:String): Result {
+    suspend fun fetchByBodypart(part:String): Result<List<Exercise>> {
         return try{
             val result =
                 exerciseService.getByBodyPart(part)
             Result.Success(result)
         } catch (e:Exception){
             Log.d("AllExerciseRepo","Failed: ${e.message}")
-            Result.Failure(e)
+            Result.Error(e)
         }
     }
 }

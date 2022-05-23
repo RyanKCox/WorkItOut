@@ -52,6 +52,7 @@ fun MainMenu(navController: NavController){
                     Button(
                         onClick = {
                             navController.navigate(NavScreen.RoutineViewScreen.route)
+//                            navController.navigate(NavScreen.WorkoutListScreen.route)
 
                         },
                         modifier = Modifier
