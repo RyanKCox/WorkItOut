@@ -7,9 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,10 +28,9 @@ import androidx.navigation.NavController
 fun RoutineViewScreen(navController: NavController){
     val context = LocalContext.current
     val viewModel = ViewModelProvider(context as MainActivity).get(RoutineVM::class.java)
-    viewModel.loadRoutines(context)
 
-    val routineList = viewModel.routineList.observeAsState()
-    val exerciseList = viewModel.exerciseList.observeAsState()
+
+    val exerciseList = viewModel.exerciseList/*.observeAsState()*/
 
     Scaffold(
         topBar = {
@@ -45,26 +42,35 @@ fun RoutineViewScreen(navController: NavController){
         },
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    viewModel.deleteRoutine(context)
+            if(!viewModel.routineList.isNullOrEmpty()) {
+                FloatingActionButton(
+                    onClick = {
+                        viewModel.deleteRoutine()
+                    }
+                ) {
+                    Icon(imageVector = Icons.Filled.Delete, contentDescription = "DeleteIcon")
                 }
-            ) {
-                Icon(imageVector = Icons.Filled.Delete, contentDescription = "DeleteIcon")
             }
         }
     ){
         Column(modifier = Modifier.fillMaxSize()) {
 
-            if (routineList.value != null) {
-                if (routineList.value!!.isNotEmpty()) {
+            Spacer(modifier = Modifier.size(10.dp))
 
-                    RoutineDropDown(viewModel)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.height(IntrinsicSize.Min)
+            ){
 
-                    Button(onClick = { viewModel.createRoutine(context) }) {
-                        Text("Add Routine")
+                RoutineDropDown(viewModel)
 
-                    }
+                MenuDropDown(
+                    viewModel,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(end = 5.dp)
+                )
+            }
 
                     val lazyState = rememberLazyListState()
                     LazyColumn(
@@ -73,13 +79,13 @@ fun RoutineViewScreen(navController: NavController){
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        items(exerciseList.value!!) { exercise ->
+                        items(exerciseList/*.value!!*/) { exercise ->
                             ExerciseCard(exercise, navController, context)
                         }
 
                     }
-                }
-            }
+//                }
+//            }
         }
     }
 }
@@ -87,8 +93,8 @@ fun RoutineViewScreen(navController: NavController){
 fun RoutineDropDown(viewModel:RoutineVM){
 
     var bOpen by rememberSaveable{ mutableStateOf(false)}
-    val routines = viewModel.routineList.observeAsState()
-    var sSelected by rememberSaveable{ mutableStateOf(routines.value!!.first().name)}
+    val selectedRoutine by remember{viewModel.selectedRoutine}
+    var sSelected = selectedRoutine?.routineEntity?.name ?: "Empty"
     var nSize by remember{ mutableStateOf(Size.Zero)}
     val icon = if(bOpen)
         Icons.Filled.KeyboardArrowUp
@@ -100,12 +106,13 @@ fun RoutineDropDown(viewModel:RoutineVM){
             value = sSelected,
             onValueChange = {sSelected = it},
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(.9f)
                 .onGloballyPositioned { coords ->
                     nSize = coords.size.toSize()
                 }
                 .clickable {
-                    bOpen = !bOpen
+                    if (!viewModel.routineList.isNullOrEmpty())
+                        bOpen = !bOpen
                 },
             label = {
                 Text(text = "Routine")
@@ -124,17 +131,65 @@ fun RoutineDropDown(viewModel:RoutineVM){
             modifier = Modifier
                 .width(with(LocalDensity.current){nSize.width.toDp()})
         ) {
-            routines.value!!.forEach {
-                DropdownMenuItem(
-                    onClick = {
-                        sSelected = it.name
-                        viewModel.findIDByName(it.name)
-                        bOpen = false
+            if( !viewModel.routineList.isNullOrEmpty()) {
+                viewModel.routineList!!.forEach {
+                    DropdownMenuItem(
+                        onClick = {
+                            sSelected = it.routineEntity.name
+                            viewModel.selectedRoutine.value = it
+//                            viewModel.selectedRoutine.postValue(it)// = it
+                            bOpen = false
+                        }
+                    ) {
+                        Text(it.routineEntity.name)
                     }
-                ) {
-                   Text(it.name)
                 }
             }
         }
     }
+}
+
+@Composable
+fun MenuDropDown(viewModel: RoutineVM, modifier: Modifier = Modifier){
+    val context = LocalContext.current
+    var bOpen by rememberSaveable{ mutableStateOf(false)}
+
+    Column(
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Menu,
+            contentDescription = "RoutineMenu",
+            modifier = modifier
+                .clickable {
+                    bOpen = !bOpen
+                }
+        )
+        DropdownMenu(
+            expanded = bOpen,
+            onDismissRequest = { bOpen = false },
+            modifier = Modifier.fillMaxWidth(.4f)
+        ) {
+
+            DropdownMenuItem(
+                onClick = {
+                    viewModel.createRoutine()
+                    bOpen = false
+                }
+            ) {
+               Text("Add Routine")
+            }
+            DropdownMenuItem(
+                onClick = {
+                    viewModel.deleteRoutine()
+                    bOpen = false
+                }
+            ) {
+                Text("Delete Routine")
+            }
+
+        }
+
+    }
+
 }

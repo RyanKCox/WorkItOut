@@ -53,6 +53,9 @@ android {
 dependencies {
     def roomVersion = "2.4.2"
 
+    //WindowSizing
+    implementation "androidx.compose.material3:material3-window-size-class:1.0.0-alpha10"
+
     //Coil Image Loading
     implementation("io.coil-kt:coil:1.4.0")
     implementation("io.coil-kt:coil-compose:1.4.0")
@@ -96,4 +99,15 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+}
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        // Treat all Kotlin warnings as errors (disabled by default)
+        allWarningsAsErrors = project.hasProperty("warningsAsErrors") ? project.warningsAsErrors : false
+
+        freeCompilerArgs += '-opt-in=kotlin.RequiresOptIn'
+
+        // Set JVM target to 1.8
+        jvmTarget = "1.8"
+    }
 }

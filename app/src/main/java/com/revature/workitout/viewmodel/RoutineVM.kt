@@ -2,15 +2,15 @@ package com.revature.workitout.viewmodel
 
 import android.app.Application
 import android.content.Context
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.revature.workitout.model.retrofit.responses.Exercise
-import com.revature.workitout.model.room.database.ExerciseDataBase
-import com.revature.workitout.model.room.database.RoutineDatabase
+import com.revature.workitout.RepositoryManager
+import com.revature.workitout.model.data.Routine
 import com.revature.workitout.model.room.entity.ExerciseEntity
-import com.revature.workitout.model.room.entity.RoutineComponent
 import com.revature.workitout.model.room.entity.RoutineEntity
 import com.revature.workitout.model.room.repo.RoutineRepo
 import kotlinx.coroutines.Dispatchers
@@ -18,69 +18,62 @@ import kotlinx.coroutines.launch
 
 class RoutineVM:ViewModel() {
 
-    var routineList = MutableLiveData<List<RoutineEntity>>()
-    var selectedRoutine:Int? = null
-    var exerciseList = MutableLiveData<List<ExerciseEntity>>()
+    var routineList :List<Routine>? = null
+    var selectedRoutine: MutableState<Routine?> = mutableStateOf(null)
+    var exerciseList = listOf<ExerciseEntity>()
 
     init {
-        routineList.postValue(listOf())
-        exerciseList.postValue(listOf())
-    }
-
-    fun findIDByName(sName:String){
-        routineList.value!!.forEach {
-            if(it.name == sName) {
-                selectedRoutine = it.id
-                return@forEach
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            loadRoutines(true)
         }
-
     }
-    fun deleteRoutine(context: Context){
-        if (selectedRoutine != null) {
+
+    fun deleteRoutine(){
+        if (selectedRoutine.value != null) {
             viewModelScope.launch(Dispatchers.IO) {
-                val routineRepo = RoutineRepo(context.applicationContext as Application)
-                routineRepo.deleteRoutine(selectedRoutine!!)
+                RepositoryManager.routineRepo.deleteRoutine(selectedRoutine.value!!.routineEntity)
+                loadRoutines(true)
             }
-            loadRoutines(context)
         }
-        selectedRoutine = if(routineList.value!= null){
-            routineList.value!!.first().id
-        }else
-            null
     }
-    fun createRoutine(context: Context){
+    fun createRoutine(){
         viewModelScope.launch(Dispatchers.IO){
-            val routineRepo = RoutineRepo(context.applicationContext as Application)
             var sName = "Test"
-            sName += routineList.value!!.size.toString()
-            routineRepo.addRoutine(RoutineEntity(
+            sName += routineList!!.size.toString()
+            val id = RepositoryManager.routineRepo.addRoutine(RoutineEntity(
                 id = 0,
                 name = sName
             ))
+            loadRoutines()
+            selectedRoutine.value = if(routineList!!.isEmpty()) null else routineList!!.last()
+
         }
-        loadRoutines(context)
+//        loadExercises(context)
     }
+//    fun loadExercises(context:Context){
+//
+//        exerciseList = listOf()
+//
+//        if(selectedRoutine.value != null){
+//            viewModelScope.launch(Dispatchers.IO) {
+//                val componentList =
+//                    RepositoryManager.routineRepo.getExercisesOfRoutine(
+//                        selectedRoutine.value!!.id
+//                    )
+//                if(componentList.isNotEmpty()){
+//                    val exeList = mutableListOf<ExerciseEntity>()
+//                    componentList.forEach {
+//                        exeList.add(RepositoryManager.exerciseRepo.getExerciseById(it.ExerciseID))
+//                    }
+//                    exerciseList = exeList
+//                }
+//            }
+//        }
+//    }
 
-    fun loadRoutines(context: Context){
-        viewModelScope.launch(Dispatchers.IO){
-            val routineDao = RoutineDatabase.getDataBase(context).routineDao()
-            val exerciseDao = ExerciseDataBase.getDatabase(context).exerciseDao()
-
-            val list = routineDao.fetchALlRoutines()
-            routineList.postValue(list)
-
-            if(list.isNotEmpty()) {
-                selectedRoutine = list.first().id
-                val componentList = routineDao.fetchRoutineComponentsById(selectedRoutine!!)
-
-                val exeList = mutableListOf<ExerciseEntity>()
-                componentList.forEach {
-                    val exercise = exerciseDao.fetchExerciseById(it.ExerciseID)
-                    exeList.add(exercise)
-                }
-                exerciseList.postValue(exeList)
-            }
-        }
+    private suspend fun loadRoutines(bSetSelected:Boolean = false){
+            routineList = RepositoryManager.routineRepo.getAllRoutinesWithExercises()
+            if(bSetSelected)
+                selectedRoutine.value = if(routineList!!.isEmpty()) null else routineList!!.first()
     }
 }

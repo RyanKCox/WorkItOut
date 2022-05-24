@@ -2,7 +2,6 @@ package com.revature.workitout.model.room.repo
 
 import android.app.Application
 import androidx.lifecycle.LiveData
-import com.revature.workitout.model.retrofit.responses.Exercise
 import com.revature.workitout.model.room.dao.ExerciseDAO
 import com.revature.workitout.model.room.database.ExerciseDataBase
 import com.revature.workitout.model.room.entity.ExerciseEntity
@@ -15,14 +14,14 @@ class ExerciseRepo(app:Application) {
         exerciseDao = instance.exerciseDao()
     }
 
-    val getAllExercises:List<ExerciseEntity> =
+    val getAllExercises:LiveData<List<ExerciseEntity>> =
             exerciseDao.fetchAllExercises()
 
     fun getExerciseById(id:Int):ExerciseEntity{
         return exerciseDao.fetchExerciseById(id)
     }
 
-    fun getExercisesByBodypart(bodypart:String):List<ExerciseEntity>{
+    fun getExercisesByBodypart(bodypart:String):LiveData<List<ExerciseEntity>>{
         return exerciseDao.fetchExerciseByBodypart(bodypart)
     }
 

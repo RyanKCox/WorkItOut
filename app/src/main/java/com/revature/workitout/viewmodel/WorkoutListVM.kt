@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.revature.workitout.RepositoryManager
 import com.revature.workitout.model.retrofit.RetrofitHelper
 import com.revature.workitout.model.retrofit.repos.AllExercisesRepo
 import com.revature.workitout.model.room.entity.ExerciseEntity
@@ -15,11 +16,12 @@ import com.revature.workitout.model.room.repo.ExerciseRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.revature.workitout.model.data.Result
+import com.revature.workitout.model.retrofit.repos.ExerciseAPIRepo
 
 class WorkoutListVM:ViewModel() {
 
     //Exercise List
-    var exerciseList = MutableLiveData<List<ExerciseEntity>>(listOf())
+    var exerciseList = RepositoryManager.exerciseRepo.getAllExercises
     private val bodypartList = MutableLiveData<List<String>>(listOf())
     fun getBodyparts():LiveData<List<String>>{
         return bodypartList
@@ -29,10 +31,10 @@ class WorkoutListVM:ViewModel() {
     var bLoading = mutableStateOf(true)
     var bLoadingFailed = mutableStateOf(false)
 
-    private fun loadBodyparts(exerciseRoomRepo: ExerciseRepo){
+    private fun loadBodyparts(){
 
         viewModelScope.launch(Dispatchers.IO) {
-            bodypartList.postValue(exerciseRoomRepo.getAllBodyParts())
+            bodypartList.postValue(RepositoryManager.exerciseRepo.getAllBodyParts())
         }
     }
 
@@ -41,7 +43,7 @@ class WorkoutListVM:ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
         val exerciseRoomRepo = ExerciseRepo(context.applicationContext as Application)
 
-            exerciseList.postValue(exerciseRoomRepo.getExercisesByBodypart(sBodypart))
+            exerciseList = exerciseRoomRepo.getExercisesByBodypart(sBodypart)
         }
     }
 
@@ -49,24 +51,30 @@ class WorkoutListVM:ViewModel() {
 
         viewModelScope.launch(Dispatchers.IO) {
 
-            val exerciseRoomRepo = ExerciseRepo(context.applicationContext as Application)
+//            val exerciseRoomRepo = ExerciseRepo(context.applicationContext as Application)
+//
+//            val list = exerciseRoomRepo.getAllExercises
 
-            val list = exerciseRoomRepo.getAllExercises
-
-            if(list.isNotEmpty()) {
-                Log.d("WorkoutlistVM", "Exercise Room Not Empty")
-                exerciseList.postValue(exerciseRoomRepo.getAllExercises)
-                bLoading.value = false
-            } else{
+            if(exerciseList.value.isNullOrEmpty()){
                 Log.d("WorkoutlistVM", "Exercise Room Empty")
-                loadExercisesByAPI(exerciseRoomRepo)
-            }
+                loadExercisesByAPI(context)
 
-            loadBodyparts(exerciseRoomRepo)
+            }
+//            if(list.isNotEmpty()) {
+//                Log.d("WorkoutlistVM", "Exercise Room Not Empty")
+//                exerciseList = RepositoryManager.exerciseRepo.getAllExercises
+////                exerciseList.postValue(exerciseRoomRepo.getAllExercises)
+//                bLoading.value = false
+//            } else{
+//                Log.d("WorkoutlistVM", "Exercise Room Empty")
+//                loadExercisesByAPI(context)
+//            }
+
+            loadBodyparts()
         }
     }
 
-    private fun loadExercisesByAPI(exerciseRoomRepo:ExerciseRepo) {
+    private fun loadExercisesByAPI(context: Context) {
 
         val exerciseService = RetrofitHelper.getWorkoutService()
         val exerciseRepo = AllExercisesRepo(exerciseService)
@@ -90,10 +98,10 @@ class WorkoutListVM:ViewModel() {
                             sEquipment = it.equipment,
                             sGifUrl = it.gifUrl
                         )
-                        exerciseRoomRepo.insertExercise(exe)
+                        RepositoryManager.exerciseRepo.insertExercise(exe)
                         list.add(exe)
                     }
-                    exerciseList.postValue(list)
+                    exerciseList = RepositoryManager.exerciseRepo.getAllExercises
                     false
                 }
                 is Result.Error -> {

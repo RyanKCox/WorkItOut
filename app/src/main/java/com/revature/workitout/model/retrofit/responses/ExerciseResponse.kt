@@ -2,7 +2,7 @@ package com.revature.workitout.model.retrofit.responses
 
 import com.google.gson.annotations.SerializedName
 
-data class Exercise(
+data class ExerciseResponse(
 
     @SerializedName("id")
     val id:String,
