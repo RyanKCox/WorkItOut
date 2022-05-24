@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class ExerciseEntity(
 
     @PrimaryKey(autoGenerate = true)
-    val id:Int,
+    val id:Long,
     var sName:String,
     var sTarget:String,
     var sBodypart:String,

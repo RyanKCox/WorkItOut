@@ -16,21 +16,8 @@ class RoutineRepo(app:Application) {
         val database = RoutineDatabase.getDataBase(app)
         routineDao = database.routineDao()
     }
-    val getAllRoutines:LiveData<List<RoutineEntity>> = routineDao.fetchALlRoutines()
-
-    fun getRoutineByID(id:Long):RoutineEntity{
-        return routineDao.fetchRoutineById(id)
-    }
-
-    fun getExercisesOfRoutine(id:Int): List<RoutineComponent>{
-        return routineDao.fetchRoutineComponentsById(id)
-    }
     fun addRoutine(routine:RoutineEntity):Long{
         return routineDao.insertRoutine(routine)
-    }
-    fun deleteRoutineById(id:Int){
-        val routine = routineDao.fetchRoutineById(id.toLong())
-        routineDao.deleteRoutine(routine)
     }
     fun deleteRoutine(routine:RoutineEntity){
         routineDao.deleteRoutineComponentsByRoutineID(routine.id.toLong())
@@ -38,6 +25,9 @@ class RoutineRepo(app:Application) {
     }
     suspend fun getAllRoutinesWithExercises():List<Routine>{
         return routineDao.getRoutinesWithExercises()
+    }
+    suspend fun addExerciseToRoutine(component: RoutineComponent){
+        routineDao.insertComponent(component)
     }
 
 }

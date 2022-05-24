@@ -36,7 +36,8 @@ fun WorkoutList(navController: NavController){
     val context = LocalContext.current
 
     val viewModel = ViewModelProvider(context as MainActivity).get(WorkoutListVM::class.java)
-    viewModel.loadExercises(context)
+
+    viewModel.loadExercises()
 
     val exercises = viewModel.exerciseList.observeAsState(listOf())
 
@@ -79,7 +80,7 @@ fun WorkoutList(navController: NavController){
 
                 items(exercises.value) { exercise ->
 
-                    ExerciseCard(exercise,navController,context)
+                    ExerciseCard(exercise,navController,context,viewModel)
 
                 }
             }
@@ -89,7 +90,6 @@ fun WorkoutList(navController: NavController){
 @Composable
 fun BodypartDropDown(viewModel:WorkoutListVM){
 
-    val context = LocalContext.current
     var bOpen by rememberSaveable{mutableStateOf(false)}
     val bodyparts = viewModel.getBodyparts().observeAsState()
     var sSelected by rememberSaveable{ mutableStateOf("All")}
@@ -135,9 +135,9 @@ fun BodypartDropDown(viewModel:WorkoutListVM){
                     onClick = {
                         sSelected = part
                         if(sSelected == "All"){
-                            viewModel.loadExercises(context)
+                            viewModel.loadExercises()
                         }else {
-                            viewModel.loadExerciseByBodypart(sSelected,context)
+                            viewModel.loadExerciseByBodypart(sSelected)
                         }
                         bOpen = false
                     }
@@ -157,7 +157,8 @@ fun BodypartDropDown(viewModel:WorkoutListVM){
 fun ExerciseCard(
     exercise:ExerciseEntity,
     navController: NavController,
-    context: Context
+    context: Context,
+    viewModel:WorkoutListVM
 ){
 
 
@@ -172,6 +173,7 @@ fun ExerciseCard(
                     ViewModelProvider(context as MainActivity)
                         .get(SingleExerciseVM::class.java)
                 singleVM.loadExercise(exercise.id,context)
+                singleVM.routineID = viewModel.routineID
                 navController.navigate(NavScreen.SingleExerciseScreen.route)
 
             }

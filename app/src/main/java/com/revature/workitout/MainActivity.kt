@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window,false)
+        WindowCompat.setDecorFitsSystemWindows(window,true)
 
         RepositoryManager.routineRepo = RoutineRepo(this.application)
         RepositoryManager.exerciseRepo = ExerciseRepo(this.application)

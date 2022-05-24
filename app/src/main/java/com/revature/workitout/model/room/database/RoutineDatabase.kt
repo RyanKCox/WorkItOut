@@ -10,7 +10,7 @@ import com.revature.workitout.model.room.entity.RoutineComponent
 
 @Database(
     entities = [RoutineEntity::class,RoutineComponent::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class RoutineDatabase:RoomDatabase() {

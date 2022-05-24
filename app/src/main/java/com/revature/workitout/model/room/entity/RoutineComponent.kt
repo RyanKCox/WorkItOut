@@ -7,9 +7,15 @@ import androidx.room.PrimaryKey
 data class RoutineComponent(
 
     @PrimaryKey(autoGenerate = true)
-    val id:Int,
-    val RoutineID:Int,
-    val ExerciseID:Int,
+    val id:Long,
+    val RoutineID:Long,
+
+    var sName:String,
+    var sTarget:String,
+    var sBodypart:String,
+    var sEquipment:String,
+    var sGifUrl:String,
+
     val Set:Int,
     val Rep:Int
 

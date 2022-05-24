@@ -17,7 +17,7 @@ class ExerciseRepo(app:Application) {
     val getAllExercises:LiveData<List<ExerciseEntity>> =
             exerciseDao.fetchAllExercises()
 
-    fun getExerciseById(id:Int):ExerciseEntity{
+    fun getExerciseById(id:Long):ExerciseEntity{
         return exerciseDao.fetchExerciseById(id)
     }
 

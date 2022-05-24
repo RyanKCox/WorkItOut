@@ -9,7 +9,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,16 +22,23 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavController
+import com.revature.workitout.view.nav.NavScreen
+import com.revature.workitout.viewmodel.WorkoutListVM
 
 @Composable
 fun RoutineViewScreen(navController: NavController){
     val context = LocalContext.current
     val viewModel = ViewModelProvider(context as MainActivity).get(RoutineVM::class.java)
+    val selectedRoutine by remember{viewModel.selectedRoutine}
 
 
     val exerciseList = viewModel.exerciseList/*.observeAsState()*/
 
+    val scaffoldState = rememberScaffoldState()
+
     Scaffold(
+        scaffoldState = scaffoldState,
+//        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
@@ -40,15 +46,20 @@ fun RoutineViewScreen(navController: NavController){
                 }
             )
         },
-        modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
-            if(!viewModel.routineList.isNullOrEmpty()) {
+            if(selectedRoutine != null) {
                 FloatingActionButton(
                     onClick = {
-                        viewModel.deleteRoutine()
+
+                        val workoutVM = ViewModelProvider(context)
+                            .get(WorkoutListVM::class.java)
+                        workoutVM.routineID = selectedRoutine!!.routineEntity.id
+
+                        navController.navigate(NavScreen.WorkoutListScreen.route)
+
                     }
                 ) {
-                    Icon(imageVector = Icons.Filled.Delete, contentDescription = "DeleteIcon")
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = "AddExerciseIcon")
                 }
             }
         }
@@ -76,11 +87,11 @@ fun RoutineViewScreen(navController: NavController){
                     LazyColumn(
                         state = lazyState,
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         items(exerciseList/*.value!!*/) { exercise ->
-                            ExerciseCard(exercise, navController, context)
+//                            ExerciseCard(exercise, navController, context)
                         }
 
                     }
@@ -137,7 +148,6 @@ fun RoutineDropDown(viewModel:RoutineVM){
                         onClick = {
                             sSelected = it.routineEntity.name
                             viewModel.selectedRoutine.value = it
-//                            viewModel.selectedRoutine.postValue(it)// = it
                             bOpen = false
                         }
                     ) {
@@ -151,7 +161,6 @@ fun RoutineDropDown(viewModel:RoutineVM){
 
 @Composable
 fun MenuDropDown(viewModel: RoutineVM, modifier: Modifier = Modifier){
-    val context = LocalContext.current
     var bOpen by rememberSaveable{ mutableStateOf(false)}
 
     Column(

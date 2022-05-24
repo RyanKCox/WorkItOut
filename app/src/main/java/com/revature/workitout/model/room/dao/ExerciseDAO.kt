@@ -11,7 +11,7 @@ interface ExerciseDAO {
     fun fetchAllExercises():LiveData<List<ExerciseEntity>>
 
     @Query("SELECT * FROM ExerciseList WHERE id = :id")
-    fun fetchExerciseById(id:Int):ExerciseEntity
+    fun fetchExerciseById(id:Long):ExerciseEntity
 
     @Query("SELECT * FROM ExerciseList WHERE sBodypart LIKE :bodypart")
     fun fetchExerciseByBodypart(bodypart:String):LiveData<List<ExerciseEntity>>
