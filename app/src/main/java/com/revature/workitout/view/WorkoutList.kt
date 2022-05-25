@@ -37,9 +37,7 @@ fun WorkoutList(navController: NavController){
 
     val viewModel = ViewModelProvider(context as MainActivity).get(WorkoutListVM::class.java)
 
-    viewModel.loadExercises()
-
-    val exercises = viewModel.exerciseList.observeAsState(listOf())
+    val exercises by viewModel.exerciseList.observeAsState(listOf())
 
 
     Scaffold(
@@ -78,7 +76,7 @@ fun WorkoutList(navController: NavController){
                     Spacer(modifier = Modifier.size(10.dp))
                 }
 
-                items(exercises.value) { exercise ->
+                items(exercises) { exercise ->
 
                     ExerciseCard(exercise,navController,context,viewModel)
 
@@ -180,7 +178,7 @@ fun ExerciseCard(
     ) {
         Row {
 
-            GifLoader(exercise,Modifier.size(150.dp))
+            GifLoader(exercise.sGifUrl,Modifier.size(150.dp))
 
             Column {
 

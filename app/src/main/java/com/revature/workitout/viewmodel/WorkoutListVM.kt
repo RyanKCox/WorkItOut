@@ -21,6 +21,10 @@ class WorkoutListVM:ViewModel() {
     private val bodypartList = MutableLiveData<List<String>>(listOf())
     var routineID:Long?=null
 
+    init {
+        loadExercises()
+    }
+
     fun getBodyparts():LiveData<List<String>>{
         return bodypartList
     }
@@ -38,9 +42,9 @@ class WorkoutListVM:ViewModel() {
 
     fun loadExerciseByBodypart(sBodypart:String){
 
-        viewModelScope.launch(Dispatchers.IO) {
+//        viewModelScope.launch(Dispatchers.IO) {
             exerciseList = RepositoryManager.exerciseRepo.getExercisesByBodypart(sBodypart)
-        }
+//        }
     }
 
     fun loadExercises(){

@@ -21,10 +21,10 @@ import com.revature.workitout.R
 import com.revature.workitout.model.room.entity.ExerciseEntity
 
 @Composable
-fun GifLoader(exercise:ExerciseEntity,modifier:Modifier = Modifier){
+fun GifLoader(webLink:String,modifier:Modifier = Modifier){
     Image(
         painter = rememberImagePainter(
-            data = exercise.sGifUrl,
+            data = webLink,
             builder = {
                 decoder(GifDecoder())
                 placeholder(R.drawable.workitout_logo)

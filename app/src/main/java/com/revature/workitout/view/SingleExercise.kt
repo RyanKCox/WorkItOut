@@ -60,7 +60,7 @@ fun SingleExercise(navController: NavController){
                                 context.resources.displayMetrics.heightPixels/context.resources.displayMetrics.density
 
                         GifLoader(
-                            exercise = exercise.value!!,
+                            webLink = exercise.value!!.sGifUrl,
                             modifier = Modifier
                                 .size(display.dp)
                                 .padding(40.dp)

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -19,10 +20,13 @@ import com.revature.workitout.viewmodel.RoutineVM
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavController
+import com.revature.workitout.model.room.entity.RoutineComponent
 import com.revature.workitout.view.nav.NavScreen
+import com.revature.workitout.viewmodel.SingleExerciseVM
 import com.revature.workitout.viewmodel.WorkoutListVM
 
 @Composable
@@ -30,9 +34,6 @@ fun RoutineViewScreen(navController: NavController){
     val context = LocalContext.current
     val viewModel = ViewModelProvider(context as MainActivity).get(RoutineVM::class.java)
     val selectedRoutine by remember{viewModel.selectedRoutine}
-
-
-    val exerciseList = viewModel.exerciseList/*.observeAsState()*/
 
     val scaffoldState = rememberScaffoldState()
 
@@ -83,23 +84,72 @@ fun RoutineViewScreen(navController: NavController){
                 )
             }
 
-                    val lazyState = rememberLazyListState()
-                    LazyColumn(
-                        state = lazyState,
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        items(exerciseList/*.value!!*/) { exercise ->
-//                            ExerciseCard(exercise, navController, context)
-                        }
+            if(selectedRoutine != null){
+
+                val lazyState = rememberLazyListState()
+                LazyColumn(
+                    state = lazyState,
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    items(selectedRoutine!!.exercises) { exercise ->
+                        RoutineComponentCard(exercise, viewModel)
+
 
                     }
-//                }
-//            }
+
+                }
+
+            }
         }
     }
 }
+@Composable
+fun RoutineComponentCard(exercise:RoutineComponent, viewModel: RoutineVM){
+    Card(
+        shape =  RoundedCornerShape(10.dp),
+        elevation = 10.dp,
+        modifier = Modifier
+            .padding(10.dp)
+            .clickable {
+
+            }
+    ) {
+        Row {
+
+            GifLoader(exercise.sGifUrl,Modifier.size(150.dp))
+
+            Column {
+
+                Text(
+                    text = exercise.sName,
+                    style = MaterialTheme.typography.subtitle1,
+                    modifier = Modifier
+                        .padding(3.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    "Body Part: ${exercise.sBodypart}",
+                    style = MaterialTheme.typography.body1
+                )
+                Text(
+                    "Target: ${exercise.sTarget}",
+                    style = MaterialTheme.typography.body1
+                )
+                Text(
+                    "Equipment: ${exercise.sEquipment}",
+                    style = MaterialTheme.typography.body1
+                )
+
+
+            }
+        }
+
+    }
+}
+
 @Composable
 fun RoutineDropDown(viewModel:RoutineVM){
 

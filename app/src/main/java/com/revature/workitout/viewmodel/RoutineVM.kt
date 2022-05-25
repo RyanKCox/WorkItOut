@@ -15,7 +15,6 @@ class RoutineVM:ViewModel() {
 
     var routineList :List<Routine>? = null
     var selectedRoutine: MutableState<Routine?> = mutableStateOf(null)
-    var exerciseList = listOf<ExerciseEntity>()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
