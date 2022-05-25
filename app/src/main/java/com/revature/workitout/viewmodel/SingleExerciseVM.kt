@@ -1,49 +1,39 @@
 package com.revature.workitout.viewmodel
 
-import android.app.Application
-import android.content.Context
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.revature.workitout.RepositoryManager
-import com.revature.workitout.model.constants.RoutineBuilder
 import com.revature.workitout.model.room.entity.ExerciseEntity
 import com.revature.workitout.model.room.entity.RoutineComponent
-import com.revature.workitout.model.room.repo.ExerciseRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SingleExerciseVM: ViewModel() {
 
     //Display Screen
-    val exercise = MutableLiveData<ExerciseEntity>()
-    val bLoading = mutableStateOf(true)
-    val bLoadingFailed = mutableStateOf(false)
+    var exercise by mutableStateOf(
+        ExerciseEntity()
+    )
+
+    var bLoading by mutableStateOf(true)
+    var bLoadingFailed by mutableStateOf(false)
 
     //AddRoutineScreen
-    var nSet = mutableStateOf(5)
-    var nRep = mutableStateOf(5)
+    var nSet by mutableStateOf(5)
+    var nRep by mutableStateOf(5)
 
     var routineID: Long? = null
 
-    var setList = RoutineBuilder.EXERCISE_SET_LIST
-    var repList = RoutineBuilder.EXERCISE_REP_LIST
 
-    fun loadExercise(id:Long,context: Context) {
+    fun loadExercise(id:Long) {
 
 
         viewModelScope.launch(Dispatchers.IO) {
-        val exerciseRoomRepo =
-           ExerciseRepo(context.applicationContext as Application)
-
-            val exe = exerciseRoomRepo.getExerciseById(id)
-
-            if(exe.sBodypart == RoutineBuilder.EXERCISE_TYPE_CARDIO)
-                setList = RoutineBuilder.CARDIO_SET_LIST
-
-            exercise.postValue(exe)
-            bLoading.value = false
+            exercise = RepositoryManager.exerciseRepo.getExerciseById(id)
+            bLoading = false
         }
 
     }
@@ -56,19 +46,19 @@ class SingleExerciseVM: ViewModel() {
 
     fun addExercise(){
 
-        if(exercise.value != null && routineID != null) {
+        if( routineID != null) {
 
             viewModelScope.launch(Dispatchers.IO) {
                 val component = RoutineComponent(
                     id = 0,
                     RoutineID = routineID!!,
-                    Rep = nRep.value,
-                    Set = nSet.value,
-                    sName = exercise.value!!.sName,
-                    sTarget = exercise.value!!.sTarget,
-                    sEquipment = exercise.value!!.sEquipment,
-                    sBodypart = exercise.value!!.sBodypart,
-                    sGifUrl = exercise.value!!.sGifUrl
+                    Rep = nRep,
+                    Set = nSet,
+                    sName = exercise.sName,
+                    sTarget = exercise.sTarget,
+                    sEquipment = exercise.sEquipment,
+                    sBodypart = exercise.sBodypart,
+                    sGifUrl = exercise.sGifUrl
                 )
                 RepositoryManager.routineRepo.addExerciseToRoutine(component)
             }

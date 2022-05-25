@@ -6,7 +6,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -15,10 +16,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.revature.workitout.MainActivity
-import com.revature.workitout.RepositoryManager
 import com.revature.workitout.model.constants.RoutineBuilder
 import com.revature.workitout.view.nav.NavScreen
 import com.revature.workitout.viewmodel.SingleExerciseVM
+import androidx.compose.runtime.getValue
 
 @Composable
 fun AddToRoutine(navController: NavController) {
@@ -27,18 +28,13 @@ fun AddToRoutine(navController: NavController) {
 
     val viewModel = ViewModelProvider(context as MainActivity).get(SingleExerciseVM::class.java)
     val lazyState = rememberLazyListState()
-    val exercise = viewModel.exercise.observeAsState()
+    val exercise = viewModel.exercise
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        if (exercise.value != null)
-                            exercise.value!!.sName
-                        else
-                            "Exercise"
-                    )
+                    Text( exercise.sName)
                 }
             )
         }
@@ -51,34 +47,30 @@ fun AddToRoutine(navController: NavController) {
         ){
             item{
 
-                if(exercise.value != null) {
-                    val display =
+                    val display by rememberSaveable{ mutableStateOf(
                         if(context.resources.displayMetrics.widthPixels < context.resources.displayMetrics.heightPixels)
                             context.resources.displayMetrics.widthPixels/context.resources.displayMetrics.density
                         else
                             context.resources.displayMetrics.heightPixels/context.resources.displayMetrics.density
+                    )}
 
                     GifLoader(
-                        webLink = exercise.value!!.sGifUrl,
+                        webLink = exercise.sGifUrl,
                         modifier = Modifier
                             .size(display.dp)
                             .padding(40.dp)
                     )
 
-                    if(exercise.value!!.sBodypart == RoutineBuilder.EXERCISE_TYPE_CARDIO){
+                    if(exercise.sBodypart == RoutineBuilder.EXERCISE_TYPE_CARDIO){
 
                         //Time for Cardio
-//                        DropDown(
-//                            label = "Time",
-//                            list = viewModel.setList,
-//                            subString = " min."
-//                        ){
-//                            viewModel.sSet.value = it
-//                        }
                         OutlinedTextField(
-                            value = viewModel.nSet.value.toString(),
+                            value = viewModel.nSet.toString(),
                             onValueChange = {
-                                viewModel.nSet.value = viewModel.numInputLimit(it.toInt())
+                                if(it != "") {
+                                    viewModel.nSet = viewModel.numInputLimit(it.toInt())
+                                } else
+                                    viewModel.nSet = 1
                             },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number
@@ -96,18 +88,13 @@ fun AddToRoutine(navController: NavController) {
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ){
-//                            DropDown(
-//                                label = "Sets",
-//                                list = viewModel.setList,
-//                                subString = " sets",
-//                                modifier = Modifier.weight(1f)
-//                            ){
-//                                viewModel.sSet.value = it
-//                            }
                             OutlinedTextField(
-                                value = viewModel.nSet.value.toString(),
+                                value = viewModel.nSet.toString(),
                                 onValueChange = {
-                                    viewModel.nSet.value = viewModel.numInputLimit(it.toInt())
+                                    if(it != "") {
+                                        viewModel.nSet = viewModel.numInputLimit(it.toInt())
+                                    } else
+                                        viewModel.nSet = 1
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -125,9 +112,12 @@ fun AddToRoutine(navController: NavController) {
                             )
 
                             OutlinedTextField(
-                                value =viewModel.nRep.value.toString(),
+                                value =viewModel.nRep.toString(),
                                 onValueChange = {
-                                    viewModel.nRep.value = viewModel.numInputLimit(it.toInt())
+                                    if(it != "") {
+                                        viewModel.nRep = viewModel.numInputLimit(it.toInt())
+                                    } else
+                                        viewModel.nRep = 1
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -139,17 +129,7 @@ fun AddToRoutine(navController: NavController) {
                                     .padding(5.dp)
                                     .weight(1f)
                             )
-
-//                            DropDown(
-//                                label = "Reps",
-//                                list = viewModel.repList,
-//                                subString = " reps",
-//                                modifier = Modifier.weight(1f)
-//                            ){
-//                                viewModel.sRep.value = it
-//                            }
                         }
-
                     }
 
                     Button(
@@ -161,7 +141,7 @@ fun AddToRoutine(navController: NavController) {
                         Text("Add")
                     }
                 }
-            }
+
         }
     }
 }

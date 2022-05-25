@@ -7,10 +7,10 @@ import androidx.room.PrimaryKey
 data class ExerciseEntity(
 
     @PrimaryKey(autoGenerate = true)
-    val id:Long,
-    var sName:String,
-    var sTarget:String,
-    var sBodypart:String,
-    var sEquipment:String,
-    var sGifUrl:String
+    val id:Long =0,
+    var sName:String="",
+    var sTarget:String="",
+    var sBodypart:String="",
+    var sEquipment:String="",
+    var sGifUrl:String=""
 )

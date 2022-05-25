@@ -37,9 +37,6 @@ fun WorkoutList(navController: NavController){
 
     val viewModel = ViewModelProvider(context as MainActivity).get(WorkoutListVM::class.java)
 
-    val exercises by viewModel.exerciseList.observeAsState(listOf())
-
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -76,7 +73,7 @@ fun WorkoutList(navController: NavController){
                     Spacer(modifier = Modifier.size(10.dp))
                 }
 
-                items(exercises) { exercise ->
+                items(viewModel.exerciseList) { exercise ->
 
                     ExerciseCard(exercise,navController,context,viewModel)
 
@@ -89,7 +86,7 @@ fun WorkoutList(navController: NavController){
 fun BodypartDropDown(viewModel:WorkoutListVM){
 
     var bOpen by rememberSaveable{mutableStateOf(false)}
-    val bodyparts = viewModel.getBodyparts().observeAsState()
+    val bodyparts = viewModel.getBodyparts()
     var sSelected by rememberSaveable{ mutableStateOf("All")}
     var nSize by remember{ mutableStateOf(Size.Zero)}
     val icon = if(bOpen)
@@ -128,7 +125,7 @@ fun BodypartDropDown(viewModel:WorkoutListVM){
             modifier = Modifier
                 .width(with(LocalDensity.current){nSize.width.toDp()})
         ) {
-            bodyparts.value?.forEach{part->
+            bodyparts.forEach{part->
                 DropdownMenuItem(
                     onClick = {
                         sSelected = part
@@ -170,7 +167,7 @@ fun ExerciseCard(
                 val singleVM =
                     ViewModelProvider(context as MainActivity)
                         .get(SingleExerciseVM::class.java)
-                singleVM.loadExercise(exercise.id,context)
+                singleVM.loadExercise(exercise.id)
                 singleVM.routineID = viewModel.routineID
                 navController.navigate(NavScreen.SingleExerciseScreen.route)
 

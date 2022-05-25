@@ -8,13 +8,13 @@ import com.revature.workitout.model.room.entity.ExerciseEntity
 interface ExerciseDAO {
 
     @Query("SELECT * FROM ExerciseList")
-    fun fetchAllExercises():LiveData<List<ExerciseEntity>>
+    fun fetchAllExercises():List<ExerciseEntity>
 
     @Query("SELECT * FROM ExerciseList WHERE id = :id")
     fun fetchExerciseById(id:Long):ExerciseEntity
 
     @Query("SELECT * FROM ExerciseList WHERE sBodypart LIKE :bodypart")
-    fun fetchExerciseByBodypart(bodypart:String):LiveData<List<ExerciseEntity>>
+    fun fetchExerciseByBodypart(bodypart:String):List<ExerciseEntity>
 
 
     @Query("SELECT DISTINCT sBodypart FROM ExerciseList ORDER BY sBodypart")
