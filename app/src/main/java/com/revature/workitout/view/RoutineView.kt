@@ -95,15 +95,47 @@ fun RoutineViewScreen(navController: NavController){
                 ) {
                     items(selectedRoutine!!.exercises) { exercise ->
                         RoutineComponentCard(exercise, viewModel)
-
-
                     }
-
                 }
-
             }
         }
     }
+
+    if(viewModel.addRoutineDialog){
+        var sName by rememberSaveable{ mutableStateOf("")}
+        AlertDialog(
+            onDismissRequest = {viewModel.addRoutineDialog = false},
+            title = { Text("Name of Routine?") },
+            text = {
+                OutlinedTextField(
+                    value = sName,
+                    onValueChange = { sName = it }
+                )
+            },
+            buttons = {
+
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            viewModel.createRoutine(sName)
+                            viewModel.addRoutineDialog = false
+                        }
+                    ) {
+                        Text("Accept")
+                    }
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = { viewModel.addRoutineDialog = false }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            }
+        )
+    }
+
+
 }
 @Composable
 fun RoutineComponentCard(exercise:RoutineComponent, viewModel: RoutineVM){
@@ -232,7 +264,8 @@ fun MenuDropDown(viewModel: RoutineVM, modifier: Modifier = Modifier){
 
             DropdownMenuItem(
                 onClick = {
-                    viewModel.createRoutine()
+//                    viewModel.createRoutine()
+                    viewModel.addRoutineDialog = true
                     bOpen = false
                 }
             ) {

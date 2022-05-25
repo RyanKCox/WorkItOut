@@ -1,7 +1,9 @@
 package com.revature.workitout.viewmodel
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.revature.workitout.RepositoryManager
@@ -15,6 +17,7 @@ class RoutineVM:ViewModel() {
 
     var routineList :List<Routine>? = null
     var selectedRoutine: MutableState<Routine?> = mutableStateOf(null)
+    var addRoutineDialog by mutableStateOf(false)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -30,10 +33,10 @@ class RoutineVM:ViewModel() {
             }
         }
     }
-    fun createRoutine(){
+    fun createRoutine(sName:String){
         viewModelScope.launch(Dispatchers.IO){
-            var sName = "Test"
-            sName += routineList!!.size.toString()
+//            var sName = "Test"
+//            sName += routineList!!.size.toString()
             RepositoryManager.routineRepo.addRoutine(RoutineEntity(
                 id = 0,
                 name = sName
@@ -42,28 +45,7 @@ class RoutineVM:ViewModel() {
             selectedRoutine.value = if(routineList!!.isEmpty()) null else routineList!!.last()
 
         }
-//        loadExercises(context)
     }
-//    fun loadExercises(context:Context){
-//
-//        exerciseList = listOf()
-//
-//        if(selectedRoutine.value != null){
-//            viewModelScope.launch(Dispatchers.IO) {
-//                val componentList =
-//                    RepositoryManager.routineRepo.getExercisesOfRoutine(
-//                        selectedRoutine.value!!.id
-//                    )
-//                if(componentList.isNotEmpty()){
-//                    val exeList = mutableListOf<ExerciseEntity>()
-//                    componentList.forEach {
-//                        exeList.add(RepositoryManager.exerciseRepo.getExerciseById(it.ExerciseID))
-//                    }
-//                    exerciseList = exeList
-//                }
-//            }
-//        }
-//    }
 
     private suspend fun loadRoutines(bSetSelected:Boolean = false){
             routineList = RepositoryManager.routineRepo.getAllRoutinesWithExercises()

@@ -20,13 +20,13 @@ class RoutineRepo(app:Application) {
         return routineDao.insertRoutine(routine)
     }
     fun deleteRoutine(routine:RoutineEntity){
-        routineDao.deleteRoutineComponentsByRoutineID(routine.id.toLong())
+        routineDao.deleteRoutineComponentsByRoutineID(routine.id)
         routineDao.deleteRoutine(routine)
     }
     suspend fun getAllRoutinesWithExercises():List<Routine>{
         return routineDao.getRoutinesWithExercises()
     }
-    suspend fun addExerciseToRoutine(component: RoutineComponent){
+    fun addExerciseToRoutine(component: RoutineComponent){
         routineDao.insertComponent(component)
     }
 
