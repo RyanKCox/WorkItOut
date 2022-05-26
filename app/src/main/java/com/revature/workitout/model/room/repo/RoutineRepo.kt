@@ -8,7 +8,14 @@ import com.revature.workitout.model.room.dao.RoutineDAO
 import com.revature.workitout.model.room.entity.RoutineComponent
 import com.revature.workitout.model.room.entity.RoutineEntity
 
-class RoutineRepo(app:Application) {
+interface IRoutineRepo {
+    fun addRoutine(routine: RoutineEntity): Long
+    fun deleteRoutine(routine: RoutineEntity)
+    suspend fun getAllRoutinesWithExercises(): List<Routine>
+    fun addExerciseToRoutine(component: RoutineComponent)
+}
+
+class RoutineRepo(app:Application) : IRoutineRepo {
 
     private var routineDao: RoutineDAO
 
@@ -16,17 +23,17 @@ class RoutineRepo(app:Application) {
         val database = RoutineDatabase.getDataBase(app)
         routineDao = database.routineDao()
     }
-    fun addRoutine(routine:RoutineEntity):Long{
+    override fun addRoutine(routine:RoutineEntity):Long{
         return routineDao.insertRoutine(routine)
     }
-    fun deleteRoutine(routine:RoutineEntity){
+    override fun deleteRoutine(routine:RoutineEntity){
         routineDao.deleteRoutineComponentsByRoutineID(routine.id)
         routineDao.deleteRoutine(routine)
     }
-    suspend fun getAllRoutinesWithExercises():List<Routine>{
+    override suspend fun getAllRoutinesWithExercises():List<Routine>{
         return routineDao.getRoutinesWithExercises()
     }
-    fun addExerciseToRoutine(component: RoutineComponent){
+    override fun addExerciseToRoutine(component: RoutineComponent){
         routineDao.insertComponent(component)
     }
 

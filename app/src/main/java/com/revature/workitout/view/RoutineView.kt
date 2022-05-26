@@ -1,5 +1,6 @@
 package com.revature.workitout.view
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,14 +26,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavController
 import com.revature.workitout.model.room.entity.RoutineComponent
+import com.revature.workitout.model.room.repo.RoutineRepo
 import com.revature.workitout.view.nav.NavScreen
+import com.revature.workitout.viewmodel.RoutineVMFactory
 import com.revature.workitout.viewmodel.SingleExerciseVM
 import com.revature.workitout.viewmodel.WorkoutListVM
 
 @Composable
 fun RoutineViewScreen(navController: NavController){
     val context = LocalContext.current
-    val viewModel = ViewModelProvider(context as MainActivity).get(RoutineVM::class.java)
+
+//    val viewModel = ViewModelProvider(context as MainActivity).get(RoutineVM::class.java)
+    val viewModel by lazy {
+        ViewModelProvider(
+            context as MainActivity,
+            RoutineVMFactory(RoutineRepo(context.application))
+        )
+            .get(RoutineVM::class.java)
+    }
+
     val selectedRoutine by remember{viewModel.selectedRoutine}
 
     val scaffoldState = rememberScaffoldState()
@@ -52,7 +64,7 @@ fun RoutineViewScreen(navController: NavController){
                 FloatingActionButton(
                     onClick = {
 
-                        val workoutVM = ViewModelProvider(context)
+                        val workoutVM = ViewModelProvider(context as MainActivity)
                             .get(WorkoutListVM::class.java)
                         workoutVM.routineID = selectedRoutine!!.routineEntity.id
 

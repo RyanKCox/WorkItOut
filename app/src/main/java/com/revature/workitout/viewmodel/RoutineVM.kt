@@ -5,39 +5,38 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.revature.workitout.RepositoryManager
 import com.revature.workitout.model.data.Routine
-import com.revature.workitout.model.room.entity.ExerciseEntity
 import com.revature.workitout.model.room.entity.RoutineEntity
-import kotlinx.coroutines.Dispatchers
+import com.revature.workitout.model.room.repo.IRoutineRepo
+import com.revature.workitout.model.room.repo.RoutineRepo
+import com.revature.workitout.viewmodel.providers.CoroutineProvider
 import kotlinx.coroutines.launch
 
-class RoutineVM:ViewModel() {
+class RoutineVM( private val routineRepo: IRoutineRepo, private val coroutineProvider: CoroutineProvider ):ViewModel() {
 
     var routineList :List<Routine>? = null
     var selectedRoutine: MutableState<Routine?> = mutableStateOf(null)
     var addRoutineDialog by mutableStateOf(false)
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(coroutineProvider.io) {
             loadRoutines(true)
         }
     }
 
     fun deleteRoutine(){
         if (selectedRoutine.value != null) {
-            viewModelScope.launch(Dispatchers.IO) {
-                RepositoryManager.routineRepo.deleteRoutine(selectedRoutine.value!!.routineEntity)
+            viewModelScope.launch(coroutineProvider.io) {
+                routineRepo.deleteRoutine(selectedRoutine.value!!.routineEntity)
                 loadRoutines(true)
             }
         }
     }
     fun createRoutine(sName:String){
-        viewModelScope.launch(Dispatchers.IO){
-//            var sName = "Test"
-//            sName += routineList!!.size.toString()
-            RepositoryManager.routineRepo.addRoutine(RoutineEntity(
+        viewModelScope.launch(coroutineProvider.io){
+            routineRepo.addRoutine(RoutineEntity(
                 id = 0,
                 name = sName
             ))
@@ -48,8 +47,17 @@ class RoutineVM:ViewModel() {
     }
 
     private suspend fun loadRoutines(bSetSelected:Boolean = false){
-            routineList = RepositoryManager.routineRepo.getAllRoutinesWithExercises()
+            routineList = routineRepo.getAllRoutinesWithExercises()
             if(bSetSelected)
                 selectedRoutine.value = if(routineList!!.isEmpty()) null else routineList!!.first()
+    }
+}
+class RoutineVMFactory(private val routineRepo: RoutineRepo):
+        ViewModelProvider.Factory{
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        if(modelClass.isAssignableFrom(RoutineVM::class.java)){
+            return RoutineVM(routineRepo,CoroutineProvider()) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel Class")
     }
 }

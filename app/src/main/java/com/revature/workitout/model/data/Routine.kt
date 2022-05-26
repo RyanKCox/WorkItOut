@@ -12,5 +12,5 @@ data class Routine(
         parentColumn = "id",
         entityColumn = "RoutineID"
     )
-    val exercises:List<RoutineComponent>
+    val exercises:MutableList<RoutineComponent>
 )
