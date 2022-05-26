@@ -16,7 +16,7 @@ data class RoutineComponent(
     var sEquipment:String,
     var sGifUrl:String,
 
-    val Set:Int,
-    val Rep:Int
+    var Set:Int,
+    var Rep:Int
 
 )

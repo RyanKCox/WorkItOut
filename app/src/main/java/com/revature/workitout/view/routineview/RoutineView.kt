@@ -28,6 +28,8 @@ import androidx.navigation.NavController
 import com.revature.workitout.model.room.entity.RoutineComponent
 import com.revature.workitout.model.room.repo.RoutineRepo
 import com.revature.workitout.view.nav.NavScreen
+import com.revature.workitout.view.routineview.ComponentEditor
+import com.revature.workitout.view.routineview.DisplayRoutineList
 import com.revature.workitout.viewmodel.RoutineVMFactory
 import com.revature.workitout.viewmodel.SingleExerciseVM
 import com.revature.workitout.viewmodel.WorkoutListVM
@@ -35,8 +37,6 @@ import com.revature.workitout.viewmodel.WorkoutListVM
 @Composable
 fun RoutineViewScreen(navController: NavController){
     val context = LocalContext.current
-
-//    val viewModel = ViewModelProvider(context as MainActivity).get(RoutineVM::class.java)
     val viewModel by lazy {
         ViewModelProvider(
             context as MainActivity,
@@ -45,119 +45,43 @@ fun RoutineViewScreen(navController: NavController){
             .get(RoutineVM::class.java)
     }
 
-    val selectedRoutine by remember{viewModel.selectedRoutine}
 
-    val scaffoldState = rememberScaffoldState()
+    if(!viewModel.bDisplayExercise){
 
-    Scaffold(
-        scaffoldState = scaffoldState,
-//        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("Routines")
-                }
-            )
-        },
-        floatingActionButton = {
-            if(selectedRoutine != null) {
-                FloatingActionButton(
-                    onClick = {
+        //Display Routine list if no exercise is selected
 
-                        val workoutVM = ViewModelProvider(context as MainActivity)
-                            .get(WorkoutListVM::class.java)
-                        workoutVM.routineID = selectedRoutine!!.routineEntity.id
-
-                        navController.navigate(NavScreen.WorkoutListScreen.route)
-
-                    }
-                ) {
-                    Icon(imageVector = Icons.Filled.Add, contentDescription = "AddExerciseIcon")
-                }
-            }
-        }
-    ){
-        Column(modifier = Modifier.fillMaxSize()) {
-
-            Spacer(modifier = Modifier.size(10.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.height(IntrinsicSize.Min)
-            ){
-
-                RoutineDropDown(viewModel)
-
-                MenuDropDown(
-                    viewModel,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(end = 5.dp)
-                )
-            }
-
-            if(selectedRoutine != null){
-
-                val lazyState = rememberLazyListState()
-                LazyColumn(
-                    state = lazyState,
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    items(selectedRoutine!!.exercises) { exercise ->
-                        RoutineComponentCard(exercise, viewModel)
-                    }
-                }
-            }
-        }
-    }
-
-    if(viewModel.addRoutineDialog){
-        var sName by rememberSaveable{ mutableStateOf("")}
-        AlertDialog(
-            onDismissRequest = {viewModel.addRoutineDialog = false},
-            title = { Text("Name of Routine?") },
-            text = {
-                OutlinedTextField(
-                    value = sName,
-                    onValueChange = { sName = it }
-                )
-            },
-            buttons = {
-
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            viewModel.createRoutine(sName)
-                            viewModel.addRoutineDialog = false
-                        }
-                    ) {
-                        Text("Accept")
-                    }
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = { viewModel.addRoutineDialog = false }
-                    ) {
-                        Text("Cancel")
-                    }
-                }
-            }
+        DisplayRoutineList(
+            navController = navController,
+            viewModel = viewModel
         )
     }
+    else {
+
+        //Display Exercise editor if one is selected
+        ComponentEditor(
+            viewModel = viewModel
+        )
+
+    }
+
+
+
 
 
 }
 @Composable
-fun RoutineComponentCard(exercise:RoutineComponent, viewModel: RoutineVM){
+fun RoutineComponentCard(
+    exercise:RoutineComponent,
+    viewModel: RoutineVM
+){
     Card(
         shape =  RoundedCornerShape(10.dp),
         elevation = 10.dp,
         modifier = Modifier
             .padding(10.dp)
             .clickable {
-
+                viewModel.selectedComponent.value = exercise
+                viewModel.bDisplayExercise = true
             }
     ) {
         Row {

@@ -8,3 +8,9 @@ fun makeUppercase(string:String):String{
         }
     }
 }
+fun numInputLimit(num:Int):Int{
+    if(num > 99){
+        return num % 100
+    }
+    return num
+}

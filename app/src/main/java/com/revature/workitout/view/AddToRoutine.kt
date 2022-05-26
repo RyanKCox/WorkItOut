@@ -20,6 +20,7 @@ import com.revature.workitout.model.constants.RoutineBuilder
 import com.revature.workitout.view.nav.NavScreen
 import com.revature.workitout.viewmodel.SingleExerciseVM
 import androidx.compose.runtime.getValue
+import com.revature.workitout.viewmodel.numInputLimit
 
 @Composable
 fun AddToRoutine(navController: NavController) {
@@ -68,7 +69,7 @@ fun AddToRoutine(navController: NavController) {
                             value = viewModel.nSet.toString(),
                             onValueChange = {
                                 if(it != "") {
-                                    viewModel.nSet = viewModel.numInputLimit(it.toInt())
+                                    viewModel.nSet = numInputLimit(it.toInt())
                                 } else
                                     viewModel.nSet = 1
                             },
@@ -92,7 +93,7 @@ fun AddToRoutine(navController: NavController) {
                                 value = viewModel.nSet.toString(),
                                 onValueChange = {
                                     if(it != "") {
-                                        viewModel.nSet = viewModel.numInputLimit(it.toInt())
+                                        viewModel.nSet = numInputLimit(it.toInt())
                                     } else
                                         viewModel.nSet = 1
                                 },
@@ -115,7 +116,7 @@ fun AddToRoutine(navController: NavController) {
                                 value =viewModel.nRep.toString(),
                                 onValueChange = {
                                     if(it != "") {
-                                        viewModel.nRep = viewModel.numInputLimit(it.toInt())
+                                        viewModel.nRep = numInputLimit(it.toInt())
                                     } else
                                         viewModel.nRep = 1
                                 },
