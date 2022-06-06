@@ -53,10 +53,15 @@ class RoutineVM( private val routineRepo: IRoutineRepo, private val coroutinePro
         }
     }
 
-    private suspend fun loadRoutines(bSetSelected:Boolean = false){
+    suspend fun loadRoutines(bSetSelected:Boolean = false){
             routineList = routineRepo.getAllRoutinesWithExercises()
             if(bSetSelected)
                 selectedRoutine.value = if(routineList!!.isEmpty()) null else routineList!!.first()
+    }
+    suspend fun reloadSelectedRoutine(){
+        if(selectedRoutine.value != null){
+            selectedRoutine.value = routineRepo.getRoutineById(selectedRoutine.value!!.routineEntity.id)
+        }
     }
 
     fun updateComponent(){

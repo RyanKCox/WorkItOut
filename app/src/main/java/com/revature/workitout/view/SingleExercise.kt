@@ -20,6 +20,7 @@ import com.revature.workitout.model.room.entity.ExerciseEntity
 import com.revature.workitout.view.nav.NavScreen
 import com.revature.workitout.viewmodel.SingleExerciseVM
 import androidx.compose.runtime.getValue
+import com.revature.workitout.viewmodel.utility.GifSizer
 
 @Composable
 fun SingleExercise(navController: NavController){
@@ -55,12 +56,7 @@ fun SingleExercise(navController: NavController){
                     OnLoadingFail()
                 }
                 else{
-                    val display by rememberSaveable{ mutableStateOf(
-                        if(context.resources.displayMetrics.widthPixels < context.resources.displayMetrics.heightPixels)
-                            context.resources.displayMetrics.widthPixels/context.resources.displayMetrics.density
-                    else
-                            context.resources.displayMetrics.heightPixels/context.resources.displayMetrics.density
-                    )}
+                    val display by rememberSaveable{ mutableStateOf(GifSizer(context))}
 
                     GifLoader(
                         webLink = exercise.sGifUrl,
@@ -101,15 +97,15 @@ fun DisplayInfo(exercise: ExerciseEntity){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp)
+                .padding(3.dp)
         ){
-            Column(Modifier.fillMaxWidth(.5f)) {
+            Column(Modifier.weight(1f)) {
                 Text(
                     "Body Part: ",
                     style = MaterialTheme.typography.body1)
 
             }
-            Column(Modifier.fillMaxWidth()) {
+            Column(Modifier.weight(1f)) {
                 Text(
                     exercise.sBodypart,
                     style = MaterialTheme.typography.body1)
@@ -120,15 +116,15 @@ fun DisplayInfo(exercise: ExerciseEntity){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp)
+                .padding(3.dp)
         ){
-            Column(Modifier.fillMaxWidth(.5f)) {
+            Column(Modifier.weight(1f)) {
                 Text(
                     "Target Muscle: ",
                     style = MaterialTheme.typography.body1)
 
             }
-            Column(Modifier.fillMaxWidth()) {
+            Column(Modifier.weight(1f)) {
                 Text(
                     exercise.sTarget,
                     style = MaterialTheme.typography.body1)
@@ -139,15 +135,15 @@ fun DisplayInfo(exercise: ExerciseEntity){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp)
+                .padding(3.dp)
         ){
-            Column(Modifier.fillMaxWidth(.5f)) {
+            Column(Modifier.weight(1f)) {
                 Text(
                     "Equipment: ",
                     style = MaterialTheme.typography.body1)
 
             }
-            Column(Modifier.fillMaxWidth()) {
+            Column(Modifier.weight(1f)) {
                 Text(
                     exercise.sEquipment,
                     style = MaterialTheme.typography.body1)

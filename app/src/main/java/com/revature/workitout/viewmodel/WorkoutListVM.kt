@@ -17,14 +17,17 @@ import com.revature.workitout.model.data.Result
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.revature.workitout.model.data.Routine
+import com.revature.workitout.model.room.entity.RoutineComponent
 
 class WorkoutListVM:ViewModel() {
 
     //Exercise List
     var exerciseList = mutableStateListOf<ExerciseEntity>()
-//    private val bodypartList = MutableLiveData<List<String>>(listOf())
     private var bodypartList = mutableStateListOf<String>()
     var routineID:Long?=null
+    var selectedExercise:ExerciseEntity? = null
+    var bDisplayExercise by mutableStateOf(false)
 
     init {
         loadExercises()
@@ -44,7 +47,6 @@ class WorkoutListVM:ViewModel() {
             bodypartList.clear()
             bodypartList.add("All")
             bodypartList.addAll(RepositoryManager.exerciseRepo.getAllBodyParts())
-//            bodypartList.postValue(RepositoryManager.exerciseRepo.getAllBodyParts())
         }
     }
 
@@ -108,6 +110,30 @@ class WorkoutListVM:ViewModel() {
             }
             is Result.Loading -> {
                 true
+            }
+        }
+    }
+
+
+    fun addExerciseToRoutine(nSet:Int,nRep:Int, routineVM: RoutineVM){
+
+        if( routineID != null && selectedExercise != null) {
+
+            viewModelScope.launch(Dispatchers.IO) {
+                val component = RoutineComponent(
+                    id = 0,
+                    RoutineID = routineID!!,
+                    Rep = nRep,
+                    Set = nSet,
+                    sName = selectedExercise!!.sName,
+                    sTarget = selectedExercise!!.sTarget,
+                    sEquipment = selectedExercise!!.sEquipment,
+                    sBodypart = selectedExercise!!.sBodypart,
+                    sGifUrl = selectedExercise!!.sGifUrl
+                )
+                RepositoryManager.routineRepo.addExerciseToRoutine(component)
+                routineVM.loadRoutines()
+                routineVM.reloadSelectedRoutine()
             }
         }
     }

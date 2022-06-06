@@ -20,7 +20,7 @@ import com.revature.workitout.model.constants.RoutineBuilder
 import com.revature.workitout.view.nav.NavScreen
 import com.revature.workitout.viewmodel.SingleExerciseVM
 import androidx.compose.runtime.getValue
-import com.revature.workitout.viewmodel.numInputLimit
+import com.revature.workitout.viewmodel.utility.numInputLimit
 
 @Composable
 fun AddToRoutine(navController: NavController) {

@@ -4,35 +4,39 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.revature.workitout.model.constants.RoutineBuilder
+import com.revature.workitout.model.room.entity.ExerciseEntity
+import com.revature.workitout.view.DisplayInfo
 import com.revature.workitout.view.GifLoader
+import com.revature.workitout.view.shared.EditSetRep
+import com.revature.workitout.viewmodel.utility.GifSizer
 import com.revature.workitout.viewmodel.RoutineVM
-import com.revature.workitout.viewmodel.numInputLimit
 
 @Composable
-fun ComponentEditor(viewModel:RoutineVM){
+fun ComponentEditor(
+    exercise: ExerciseEntity,
+    setValue:Int,
+    repValue:Int,
+    onBack:()->Unit,
+    onAccept:( set:Int,rep:Int )->Unit
+){
 
     val lazyState = rememberLazyListState()
     val context = LocalContext.current
-    var exercise by viewModel.selectedComponent
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text( exercise!!.sName)
+                    Text(exercise.sName)
                 }
             )
         }
@@ -45,121 +49,66 @@ fun ComponentEditor(viewModel:RoutineVM){
         ){
             item{
 
-                val display by rememberSaveable{ mutableStateOf(
-                    if(context.resources.displayMetrics.widthPixels < context.resources.displayMetrics.heightPixels)
-                        context.resources.displayMetrics.widthPixels/context.resources.displayMetrics.density
-                    else
-                        context.resources.displayMetrics.heightPixels/context.resources.displayMetrics.density
-                )
-                }
+                val display by rememberSaveable{ mutableStateOf( GifSizer(context))}
 
                 GifLoader(
-                    webLink = exercise!!.sGifUrl,
+                    webLink = exercise.sGifUrl,
                     modifier = Modifier
                         .size(display.dp)
                         .padding(40.dp)
                 )
+                DisplayInfo(exercise)
 
-                var sSet by rememberSaveable {
-                    mutableStateOf(exercise!!.Set.toString())
-                }
-                var sRep by rememberSaveable {
-                    mutableStateOf(exercise!!.Rep.toString())
-                }
+                var nSet by rememberSaveable{ mutableStateOf(setValue)}
+                var nRep by rememberSaveable{ mutableStateOf(repValue)}
 
-                if(exercise!!.sBodypart == RoutineBuilder.EXERCISE_TYPE_CARDIO){
+                var bDisplayInputError by rememberSaveable{ mutableStateOf(false)}
 
-                    //Time for Cardio
-                    OutlinedTextField(
-                        value = sSet,
-                        onValueChange = {
-                            if(it != "") {
-                                exercise!!.Set = numInputLimit(it.toInt())
-                                sSet = exercise!!.Set.toString()
-                            } else {
-                                sSet = "1"
-                                exercise!!.Set = 1
-                            }
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number
-                        ),
-                        label = {
-                            Text(text = "Sets:")
-                        }
+                if(bDisplayInputError){
+                    Text(
+                        text = "Set or Rep cannot be 0 or empty",
+                        color = Color.Red
                     )
+                }
 
+                if(exercise.sBodypart == RoutineBuilder.EXERCISE_TYPE_CARDIO){
+                    //Time for Cardio
+
+                    EditSetRep(
+                        setValue = nSet,
+                        onSetChange = {nSet = it}
+                    )
                 }
                 else{
                     // rep/set count for other
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
-                        OutlinedTextField(
-                            value = sSet,
-                            onValueChange = {
-                                if(it != "") {
-                                    exercise!!.Set = numInputLimit(it.toInt())
-                                    sSet = exercise!!.Set.toString()
-                                } else {
-                                    sSet = "1"
-                                    exercise!!.Set = 1
-                                }
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
-                            ),
-                            label = {
-                                Text(text = "Sets:")
-                            },
-                            modifier = Modifier
-                                .padding(5.dp)
-                                .weight(1f)
-                        )
 
-                        Text(
-                            text = " of "
-                        )
-
-                        OutlinedTextField(
-                            value =sRep,
-                            onValueChange = {
-                                if(it != "") {
-                                    exercise!!.Rep = numInputLimit(it.toInt())
-                                    sRep = exercise!!.Rep.toString()
-                                } else {
-                                    sRep = "1"
-                                    exercise!!.Rep = 1
-                                }
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
-                            ),
-                            label = {
-                                Text(text = "Reps:")
-                            },
-                            modifier = Modifier
-                                .padding(5.dp)
-                                .weight(1f)
-                        )
-                    }
+                    EditSetRep(
+                        setValue = nSet,
+                        repValue = nRep,
+                        onSetChange = { nSet = it },
+                        onRepChange = {nRep = it}
+                    )
                 }
 
                 Button(
                     onClick = {
-                        viewModel.updateComponent()
-                        viewModel.bDisplayExercise = false
+                        if(nSet == 0 || nRep == 0){
+                            //display error
+                            bDisplayInputError = true
+                        }
+                        else {
+
+                            onAccept(nSet,nRep)
+                        }
                     }
                 ) {
-                    Text("Add")
+                    Text("Done")
                 }
             }
 
         }
     }
     BackHandler {
-        viewModel.bDisplayExercise = false
+        onBack()
     }
 }

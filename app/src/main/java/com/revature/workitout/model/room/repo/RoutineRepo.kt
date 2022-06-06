@@ -12,8 +12,9 @@ interface IRoutineRepo {
     fun addRoutine(routine: RoutineEntity): Long
     fun deleteRoutine(routine: RoutineEntity)
     suspend fun getAllRoutinesWithExercises(): List<Routine>
-    fun addExerciseToRoutine(component: RoutineComponent)
+    suspend fun addExerciseToRoutine(component: RoutineComponent)
     fun insertComponent(component: RoutineComponent)
+    suspend fun getRoutineById(id:Long):Routine
 }
 
 class RoutineRepo(app:Application) : IRoutineRepo {
@@ -34,12 +35,16 @@ class RoutineRepo(app:Application) : IRoutineRepo {
     override suspend fun getAllRoutinesWithExercises():List<Routine>{
         return routineDao.getRoutinesWithExercises()
     }
-    override fun addExerciseToRoutine(component: RoutineComponent){
+    override suspend fun addExerciseToRoutine(component: RoutineComponent){
         routineDao.insertComponent(component)
     }
 
     override fun insertComponent(component: RoutineComponent) {
         routineDao.insertComponent(component)
+    }
+
+    override suspend fun getRoutineById(id: Long):Routine {
+        return routineDao.getRoutineFromID(id)
     }
 
 }

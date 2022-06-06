@@ -36,4 +36,8 @@ interface RoutineDAO {
     @Transaction
     @Query("SELECT * FROM Routines")
     suspend fun getRoutinesWithExercises():List<Routine>
+
+    @Transaction
+    @Query("SELECT * FROM Routines WHERE id = :id")
+    suspend fun getRoutineFromID(id:Long):Routine
 }

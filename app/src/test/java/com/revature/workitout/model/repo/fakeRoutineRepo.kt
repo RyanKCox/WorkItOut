@@ -33,7 +33,15 @@ class fakeRoutineRepo: IRoutineRepo {
         return list
     }
 
-    override fun addExerciseToRoutine(component: RoutineComponent) {
+    override suspend fun addExerciseToRoutine(component: RoutineComponent) {
+        TODO("Not yet implemented")
+    }
+
+    override fun insertComponent(component: RoutineComponent) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getRoutineById(id: Long): Routine {
         TODO("Not yet implemented")
     }
 }

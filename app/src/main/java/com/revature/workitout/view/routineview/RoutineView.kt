@@ -59,7 +59,17 @@ fun RoutineViewScreen(navController: NavController){
 
         //Display Exercise editor if one is selected
         ComponentEditor(
-            viewModel = viewModel
+            exercise = viewModel.selectedComponent.value!!.toExerciseEntity(),
+            setValue = viewModel.selectedComponent.value!!.Set,
+            repValue = viewModel.selectedComponent.value!!.Rep,
+            onBack = {viewModel.bDisplayExercise = false},
+            onAccept = { set, rep->
+
+                viewModel.selectedComponent.value!!.Set = set
+                viewModel.selectedComponent.value!!.Rep = rep
+                viewModel.updateComponent()
+                viewModel.bDisplayExercise = false
+            }
         )
 
     }

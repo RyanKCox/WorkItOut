@@ -1,5 +1,6 @@
 package com.revature.workitout.viewmodel
 
+import com.revature.workitout.viewmodel.utility.makeUppercase
 import junit.framework.TestCase
 import org.junit.Test
 

@@ -19,4 +19,14 @@ data class RoutineComponent(
     var Set:Int,
     var Rep:Int
 
-)
+){
+    fun toExerciseEntity():ExerciseEntity{
+        return ExerciseEntity(
+            sName =  sName,
+            sTarget = sTarget,
+            sBodypart = sBodypart,
+            sEquipment = sEquipment,
+            sGifUrl = sGifUrl
+        )
+    }
+}

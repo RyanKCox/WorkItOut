@@ -29,6 +29,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.revature.workitout.MainActivity
 import com.revature.workitout.model.room.entity.ExerciseEntity
 import com.revature.workitout.view.nav.NavScreen
+import com.revature.workitout.view.routineview.ComponentEditor
+import com.revature.workitout.viewmodel.RoutineVM
 import com.revature.workitout.viewmodel.SingleExerciseVM
 
 @Composable
@@ -47,36 +49,49 @@ fun WorkoutList(navController: NavController){
 
         val lazyState = rememberLazyListState()
 
-        LazyColumn(
-            state = lazyState,
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
 
-            if(viewModel.bLoading.value){
-
-                item {
-                    OnLoading()
+        if(viewModel.bDisplayExercise) {
+            ComponentEditor(
+                exercise = viewModel.selectedExercise!!,
+                setValue = 5,
+                repValue = 5,
+                onBack = { viewModel.bDisplayExercise = false },
+                onAccept = {set, rep ->
+                    val routineVM = ViewModelProvider(context as MainActivity).get(RoutineVM::class.java)
+                    viewModel.addExerciseToRoutine(set,rep,routineVM)
+                    navController.popBackStack(NavScreen.RoutineViewScreen.route,false)
                 }
+            )
+        }
+        else{
+            LazyColumn(
+                state = lazyState,
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                if (viewModel.bLoading.value) {
 
-            }
-            else if(viewModel.bLoadingFailed.value){
+                    item {
+                        OnLoading()
+                    }
 
-                item{
-                    OnLoadingFail()
-                }
+                } else if (viewModel.bLoadingFailed.value) {
 
-            }
-            else {
-                item{
-                    BodypartDropDown(viewModel)
-                    Spacer(modifier = Modifier.size(10.dp))
-                }
+                    item {
+                        OnLoadingFail()
+                    }
 
-                items(viewModel.exerciseList) { exercise ->
+                } else {
+                    item {
+                        BodypartDropDown(viewModel)
+                        Spacer(modifier = Modifier.size(10.dp))
+                    }
 
-                    ExerciseCard(exercise,navController,context,viewModel)
+                    items(viewModel.exerciseList) { exercise ->
 
+                        ExerciseCard(exercise, navController, context, viewModel)
+
+                    }
                 }
             }
         }
@@ -164,12 +179,14 @@ fun ExerciseCard(
         modifier = Modifier
             .padding(10.dp)
             .clickable {
-                val singleVM =
-                    ViewModelProvider(context as MainActivity)
-                        .get(SingleExerciseVM::class.java)
-                singleVM.loadExercise(exercise.id)
-                singleVM.routineID = viewModel.routineID
-                navController.navigate(NavScreen.SingleExerciseScreen.route)
+                viewModel.selectedExercise = exercise
+                viewModel.bDisplayExercise = true
+//                val singleVM =
+//                    ViewModelProvider(context as MainActivity)
+//                        .get(SingleExerciseVM::class.java)
+//                singleVM.loadExercise(exercise.id)
+//                singleVM.routineID = viewModel.routineID
+//                navController.navigate(NavScreen.SingleExerciseScreen.route)
 
             }
     ) {
