@@ -15,7 +15,10 @@ import com.revature.workitout.model.room.repo.RoutineRepo
 import com.revature.workitout.viewmodel.providers.CoroutineProvider
 import kotlinx.coroutines.launch
 
-class RoutineVM( private val routineRepo: IRoutineRepo, private val coroutineProvider: CoroutineProvider ):ViewModel() {
+class RoutineVM(
+    private val routineRepo: IRoutineRepo,
+    private val coroutineProvider: CoroutineProvider
+    ):ViewModel() {
 
     var routineList :List<Routine>? = null
 

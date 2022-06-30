@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.revature.workitout.view.*
+import com.revature.workitout.view.routineview.RoutineViewScreen
 
 @Composable
 fun StartNav(navController: NavHostController){
@@ -27,6 +28,12 @@ fun StartNav(navController: NavHostController){
         }
         composable(NavScreen.RoutineViewScreen.route){
             RoutineViewScreen(navController)
+        }
+        composable(NavScreen.RunRoutineScreen.route){
+            RunRoutine(navController)
+        }
+        composable(NavScreen.GymLocatorScreen.route){
+            GymLocatorScreen(navController)
         }
     }
 }
