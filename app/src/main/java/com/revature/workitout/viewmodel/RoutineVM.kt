@@ -40,7 +40,8 @@ class RoutineVM(
         if (selectedRoutine.value != null) {
             viewModelScope.launch(coroutineProvider.io) {
                 routineRepo.deleteRoutine(selectedRoutine.value!!.routineEntity)
-                loadRoutines(true)
+                selectedRoutine.value = routineList?.firstOrNull()
+                loadRoutines(/*true*/routineList!!.isNotEmpty())
             }
         }
     }
